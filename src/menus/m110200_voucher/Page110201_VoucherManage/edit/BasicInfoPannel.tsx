@@ -94,14 +94,14 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
 
                 <div className="table-item-value row-center gap-8">
                   <Select
-                    defaultValue={initialData.gmapDisplayType}
+                    defaultValue={initialData.appDisplayType}
                     options={[{ value: "1", label: "정책발행" }]}
                     style={{ width: 200, flexShrink: 0 }}
                   />
                   <TextInput
                     className="table-item-value"
                     placeholder="앱 표출 상품권명을 입력해 주세요. (12자 내외 권고, 최대 50자)"
-                    defaultValue={initialData.gmapDisplayName}
+                    defaultValue={initialData.appDisplayName}
                   />
                 </div>
               </div>
@@ -625,7 +625,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     placeholder="수수료를 입력해 주세요. (숫자만 입력)"
                     className="table-item-value"
                     align="right"
-                    defaultValue={initialData.platformOpFeeKis}
+                    defaultValue={initialData.systemOperatorFee}
                   />
                   <span className="text-body2">%</span>
                 </div>
@@ -657,7 +657,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     placeholder="수수료를 입력해 주세요. (숫자만 입력)"
                     className="table-item-value"
                     align="right"
-                    defaultValue={initialData.platformOpFeeHangyeolwon}
+                    defaultValue={initialData.platformOperatorFee}
                   />
                   <span className="text-body2">%</span>
                 </div>

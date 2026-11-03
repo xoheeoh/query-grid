@@ -39,7 +39,9 @@ export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPa
 
   const handleReset = () => {
     if (activeTab === "basic") basicRef.current?.reset();
+    else if (activeTab === "account") accountRef.current?.reset();
     else if (activeTab === "sale") saleRef.current?.reset();
+    else if (activeTab === "message") messageRef.current?.reset();
   };
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -111,9 +113,9 @@ export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPa
           </TabList>
 
           <BasicInfoPannel ref={basicRef} initialData={initialData} />
-          <AccountInfoPannel ref={accountRef} initialData={initialData} />
+          <AccountInfoPannel ref={accountRef} />
           <SaleInfoPannel ref={saleRef} initialData={initialData} />
-          <MessageInfoPannel ref={messageRef} initialData={initialData} />
+          <MessageInfoPannel ref={messageRef} />
         </Tabs>
       </div>
 

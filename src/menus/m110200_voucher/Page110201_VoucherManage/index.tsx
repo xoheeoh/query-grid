@@ -303,8 +303,8 @@ export default function VoucherManage() {
             // 기본 정보
             category: "1",
             basicAttributes: ["1"],
-            gmapDisplayType: "1",
-            gmapDisplayName: editingVoucher.voucherName,
+            appDisplayType: "1",
+            appDisplayName: editingVoucher.voucherName,
             voucherDescription: `${editingVoucher.voucherName} 전자상품권입니다.`,
             usageDescription: "전통시장 및 지정 가맹점에서 사용 가능합니다.",
             validityType: "1",
@@ -343,9 +343,9 @@ export default function VoucherManage() {
             purchaseRefundFee: "0.0",
             expireRefundFee: "0.0",
             fullWithdrawFee: "1.0",
-            platformOpFeeKis: "0.3",
+            systemOperatorFee: "0.3",
             salesFee: "2.0",
-            platformOpFeeHangyeolwon: "0.2",
+            platformOperatorFee: "0.2",
 
             // 판매/사용 정보
             channelLimits: {

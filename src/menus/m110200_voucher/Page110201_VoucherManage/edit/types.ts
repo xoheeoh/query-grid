@@ -22,8 +22,8 @@ export type VoucherEditInitialData = {
   category: string;
   /** 기본 속성: 1 개인구매불가 / 2 개인선물불가 */
   basicAttributes: string[];
-  gmapDisplayType: string;
-  gmapDisplayName: string;
+  appDisplayType: string;
+  appDisplayName: string;
   voucherDescription: string;
   usageDescription: string;
   validityType: string;
@@ -64,9 +64,9 @@ export type VoucherEditInitialData = {
   purchaseRefundFee: string;
   expireRefundFee: string;
   fullWithdrawFee: string;
-  platformOpFeeKis: string;
+  systemOperatorFee: string;
   salesFee: string;
-  platformOpFeeHangyeolwon: string;
+  platformOperatorFee: string;
 
   /** 판매처 채널 id → 한도 */
   channelLimits: Record<string, VoucherEditChannelLimit>;
