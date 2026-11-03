@@ -1,0 +1,33 @@
+@import "./styles/tokens.css";
+@import "./styles/typography.css";
+@import "./styles/utilities.css";
+@import "./styles/table.css";
+@import "./styles/page-layout.css";
+@import "./styles/ag-grid.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--color-gray-900);
+  font-size: var(--text-body2-size);
+  font-weight: var(--text-body2-weight);
+  line-height: var(--text-body2-line-height);
+  letter-spacing: var(--text-body2-letter-spacing);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}

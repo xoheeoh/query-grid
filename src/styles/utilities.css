@@ -1,0 +1,135 @@
+.text-color-primary {
+  color: var(--color-text-primary);
+}
+
+.text-color-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-color-danger {
+  color: var(--color-danger);
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-col-between {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.flex-col-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.row-start {
+  display: flex;
+  align-items: flex-start;
+}
+
+.row-center {
+  display: flex;
+  align-items: center;
+}
+
+.row-end {
+  display: flex;
+  align-items: flex-end;
+}
+
+.col-start {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.col-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.col-stretch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Gap */
+.gap-4 {
+  gap: 4px;
+}
+
+.gap-8 {
+  gap: 8px;
+}
+
+.gap-12 {
+  gap: 12px;
+}
+
+.gap-16 {
+  gap: 16px;
+}
+
+.gap-24 {
+  gap: 24px;
+}
+
+/* 2열 그리드에서 왼쪽 칸만 사용 (오른쪽은 공백) */
+.grid-col-1 {
+  grid-column: 1;
+}
+
+/* 2열 그리드에서 한 줄을 통으로 사용 */
+.grid-col-full {
+  grid-column: 1 / -1;
+}
+
+/* 조회 테이블 공통 */
+.table-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.table-item-label {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+/* flex 자식이 남은 칸을 채움 (width:100%만으로는 래퍼가 안 늘어남) */
+.table-item-value {
+  flex: 1;
+  min-width: 0;
+}

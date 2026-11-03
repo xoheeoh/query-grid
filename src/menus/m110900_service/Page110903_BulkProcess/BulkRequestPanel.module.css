@@ -1,0 +1,40 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--r-md);
+}
+
+.title {
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 16px;
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.layoutBox {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+.tableLabel {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.fileUpload {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileInput :global(input[type="file"])::file-selector-button,
+.fileInput :global(input[type="file"])::-webkit-file-upload-button {
+  display: none;
+}

@@ -1,0 +1,76 @@
+.text-heading1 {
+  font-size: var(--text-heading1-size);
+  font-weight: var(--text-heading1-weight);
+  line-height: var(--text-heading1-line-height);
+  letter-spacing: var(--text-heading1-letter-spacing);
+}
+
+.text-heading2 {
+  font-size: var(--text-heading2-size);
+  font-weight: var(--text-heading2-weight);
+  line-height: var(--text-heading2-line-height);
+  letter-spacing: var(--text-heading2-letter-spacing);
+}
+
+.text-heading3 {
+  font-size: var(--text-heading3-size);
+  font-weight: var(--text-heading3-weight);
+  line-height: var(--text-heading3-line-height);
+  letter-spacing: var(--text-heading3-letter-spacing);
+}
+
+.text-subtitle1 {
+  font-size: var(--text-subtitle1-size);
+  font-weight: var(--text-subtitle1-weight);
+  line-height: var(--text-subtitle1-line-height);
+  letter-spacing: var(--text-subtitle1-letter-spacing);
+}
+
+.text-subtitle2 {
+  font-size: var(--text-subtitle2-size);
+  font-weight: var(--text-subtitle2-weight);
+  line-height: var(--text-subtitle2-line-height);
+  letter-spacing: var(--text-subtitle2-letter-spacing);
+}
+
+.text-subtitle3 {
+  font-size: var(--text-subtitle3-size);
+  font-weight: var(--text-subtitle3-weight);
+  line-height: var(--text-subtitle3-line-height);
+  letter-spacing: var(--text-subtitle3-letter-spacing);
+}
+
+.text-subtitle4 {
+  font-size: var(--text-subtitle4-size);
+  font-weight: var(--text-subtitle4-weight);
+  line-height: var(--text-subtitle4-line-height);
+  letter-spacing: var(--text-subtitle4-letter-spacing);
+}
+
+.text-caption1 {
+  font-size: var(--text-caption1-size);
+  font-weight: var(--text-caption1-weight);
+  line-height: var(--text-caption1-line-height);
+  letter-spacing: var(--text-caption1-letter-spacing);
+}
+
+.text-caption2 {
+  font-size: var(--text-caption2-size);
+  font-weight: var(--text-caption2-weight);
+  line-height: var(--text-caption2-line-height);
+  letter-spacing: var(--text-caption2-letter-spacing);
+}
+
+.text-body1 {
+  font-size: var(--text-body1-size);
+  font-weight: var(--text-body1-weight);
+  line-height: var(--text-body1-line-height);
+  letter-spacing: var(--text-body1-letter-spacing);
+}
+
+.text-body2 {
+  font-size: var(--text-body2-size);
+  font-weight: var(--text-body2-weight);
+  line-height: var(--text-body2-line-height);
+  letter-spacing: var(--text-body2-letter-spacing);
+}

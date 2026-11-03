@@ -1,0 +1,124 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--r-md);
+}
+
+.title {
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 16px;
+}
+
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tableLabel {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.resultSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 4px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--color-border-default);
+}
+
+.resultBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  font-size: var(--text-caption1-size);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.resultBadgeSuccess {
+  background-color: var(--color-green-50);
+  color: var(--color-green-700);
+  border: 1px solid var(--color-green-200);
+}
+
+.resultBadgeError {
+  background-color: var(--color-red-50);
+  color: var(--color-red-700);
+  border: 1px solid var(--color-red-200);
+}
+
+.memberCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-gray-50);
+  min-width: 0;
+  height: stretch;
+}
+
+.memberCardFrom {
+  border-color: var(--color-primary-300);
+  background-color: var(--color-primary-50);
+}
+
+.memberCardTo {
+  border-color: var(--color-gray-200);
+  background-color: var(--color-white);
+}
+
+.memberRole {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.memberCardFrom .memberRole {
+  color: var(--color-primary-800);
+}
+
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.memberAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-full);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-default);
+}
+
+.memberCardFrom .memberAvatar {
+  background-color: var(--color-white);
+  border-color: var(--color-primary-200);
+  color: var(--color-primary-800);
+}
+
+.memberDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.resultReason {
+  margin: 0;
+  font-size: var(--text-caption1-size);
+  color: var(--color-text-secondary);
+}

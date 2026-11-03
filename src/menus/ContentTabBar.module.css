@@ -1,0 +1,77 @@
+.bar {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  gap: 0;
+  min-height: 36px;
+  padding: 6px 4px 0 4px;
+  background: var(--color-primary-900);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 0 4px 2px 6px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  transition: background 0.1s ease-in-out;
+}
+
+.tabActive {
+  color: var(--color-primary-800);
+  background: color-mix(in srgb, var(--color-primary-800) 6%, white);
+}
+
+.tabLabel {
+  appearance: none;
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab:hover:not(.tabActive) {
+  color: var(--color-primary-600);
+  background: color-mix(in srgb, var(--color-primary-800) 20%, white);
+}
+
+.closeButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  cursor: pointer;
+  transition: background 0.1s ease-in-out;
+}
+
+.closeButton:hover {
+  opacity: 1;
+  background: var(--color-primary-200);
+}
+
+.tabActive .closeButton:hover {
+  background: color-mix(in srgb, var(--color-primary-800) 12%, white);
+}

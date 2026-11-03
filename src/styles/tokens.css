@@ -1,0 +1,162 @@
+:root {
+  /* ===== Primary (기준색만 수정 — 50~900은 color-mix 파생) ===== */
+  --color-primary-800: #0d52a9;
+
+  --color-primary-50: color-mix(in srgb, var(--color-primary-800) 11%, white);
+  --color-primary-100: color-mix(in srgb, var(--color-primary-800) 18%, white);
+  --color-primary-200: color-mix(in srgb, var(--color-primary-800) 28%, white);
+  --color-primary-300: color-mix(in srgb, var(--color-primary-800) 44%, white);
+  --color-primary-400: color-mix(in srgb, var(--color-primary-800) 62%, white);
+  --color-primary-500: color-mix(in srgb, var(--color-primary-800) 76%, white);
+  --color-primary-600: color-mix(in srgb, var(--color-primary-800) 85%, white);
+  --color-primary-700: color-mix(in srgb, var(--color-primary-800) 92%, white);
+  --color-primary-900: color-mix(in srgb, var(--color-primary-800) 55%, black);
+
+  /* ===== Gray (기준색만 수정 — 100~900은 color-mix 파생) ===== */
+  --color-gray-50: #f2f4f8;
+
+  --color-white: #ffffff;
+  --color-gray-100: color-mix(in srgb, var(--color-gray-50) 97%, black);
+  --color-gray-150: color-mix(in srgb, var(--color-gray-50) 92%, black);
+  --color-gray-200: color-mix(in srgb, var(--color-gray-50) 87%, black);
+  --color-gray-300: color-mix(in srgb, var(--color-gray-50) 78%, black);
+  --color-gray-400: color-mix(in srgb, var(--color-gray-50) 70%, black);
+  --color-gray-500: color-mix(in srgb, var(--color-gray-50) 60%, black);
+  --color-gray-600: color-mix(in srgb, var(--color-gray-50) 45%, black);
+  --color-gray-700: color-mix(in srgb, var(--color-gray-50) 30%, black);
+  --color-gray-800: color-mix(in srgb, var(--color-gray-50) 20%, black);
+  --color-gray-900: color-mix(in srgb, var(--color-gray-50) 9%, black);
+
+  /* ===== Semantic — Red / Error (탈퇴·삭제 등) ===== */
+  --color-red-500: #f13221;
+
+  --color-red-50: color-mix(in srgb, var(--color-red-500) 11%, white);
+  --color-red-100: color-mix(in srgb, var(--color-red-500) 18%, white);
+  --color-red-200: color-mix(in srgb, var(--color-red-500) 28%, white);
+  --color-red-300: color-mix(in srgb, var(--color-red-500) 44%, white);
+  --color-red-400: color-mix(in srgb, var(--color-red-500) 62%, white);
+  --color-red-600: color-mix(in srgb, var(--color-red-500) 88%, black);
+  --color-red-700: color-mix(in srgb, var(--color-red-500) 74%, black);
+  --color-red-800: color-mix(in srgb, var(--color-red-500) 60%, black);
+  --color-red-900: color-mix(in srgb, var(--color-red-500) 46%, black);
+
+  /* ===== Semantic — Blue / Info (정보·활성화·신뢰) ===== */
+  --color-blue-500: #067dfd;
+
+  --color-blue-50: color-mix(in srgb, var(--color-blue-500) 11%, white);
+  --color-blue-100: color-mix(in srgb, var(--color-blue-500) 18%, white);
+  --color-blue-200: color-mix(in srgb, var(--color-blue-500) 28%, white);
+  --color-blue-300: color-mix(in srgb, var(--color-blue-500) 44%, white);
+  --color-blue-400: color-mix(in srgb, var(--color-blue-500) 62%, white);
+  --color-blue-600: color-mix(in srgb, var(--color-blue-500) 88%, black);
+  --color-blue-700: color-mix(in srgb, var(--color-blue-500) 74%, black);
+  --color-blue-800: color-mix(in srgb, var(--color-blue-500) 60%, black);
+  --color-blue-900: color-mix(in srgb, var(--color-blue-500) 46%, black);
+
+  /* ===== Semantic — Green / Positive (완료·진행·계속) ===== */
+  --color-green-500: #87c511;
+
+  --color-green-50: color-mix(in srgb, var(--color-green-500) 11%, white);
+  --color-green-100: color-mix(in srgb, var(--color-green-500) 18%, white);
+  --color-green-200: color-mix(in srgb, var(--color-green-500) 28%, white);
+  --color-green-300: color-mix(in srgb, var(--color-green-500) 44%, white);
+  --color-green-400: color-mix(in srgb, var(--color-green-500) 62%, white);
+  --color-green-600: color-mix(in srgb, var(--color-green-500) 88%, black);
+  --color-green-700: color-mix(in srgb, var(--color-green-500) 74%, black);
+  --color-green-800: color-mix(in srgb, var(--color-green-500) 60%, black);
+  --color-green-900: color-mix(in srgb, var(--color-green-500) 46%, black);
+
+  /* ===== Semantic — Yellow / Warning (주의·경고) ===== */
+  --color-yellow-500: #fea246;
+
+  --color-yellow-50: color-mix(in srgb, var(--color-yellow-500) 11%, white);
+  --color-yellow-100: color-mix(in srgb, var(--color-yellow-500) 18%, white);
+  --color-yellow-200: color-mix(in srgb, var(--color-yellow-500) 28%, white);
+  --color-yellow-300: color-mix(in srgb, var(--color-yellow-500) 44%, white);
+  --color-yellow-400: color-mix(in srgb, var(--color-yellow-500) 62%, white);
+  --color-yellow-600: color-mix(in srgb, var(--color-yellow-500) 88%, black);
+  --color-yellow-700: color-mix(in srgb, var(--color-yellow-500) 74%, black);
+  --color-yellow-800: color-mix(in srgb, var(--color-yellow-500) 60%, black);
+  --color-yellow-900: color-mix(in srgb, var(--color-yellow-500) 46%, black);
+
+  /* ===== Semantic aliases (컴포넌트용) ===== */
+  --color-text-primary: var(--color-primary-800);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-disabled: var(--color-gray-400);
+  --color-border-default: var(--color-gray-150);
+  --color-bg-disabled: var(--color-gray-100);
+  --color-focus: var(--color-primary-800);
+  --color-danger: var(--color-red-500);
+
+  /* ===== Radius ===== */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-full: 9999px;
+
+  /* ===== Typography ===== */
+  --text-line-height: 1.5;
+
+  /* heading */
+  --text-heading1-size: 28px;
+  --text-heading1-weight: 500;
+  --text-heading1-line-height: var(--text-line-height);
+  --text-heading1-letter-spacing: -0.56px;
+
+  --text-heading2-size: 24px;
+  --text-heading2-weight: 500;
+  --text-heading2-line-height: var(--text-line-height);
+  --text-heading2-letter-spacing: -0.48px;
+
+  --text-heading3-size: 20px;
+  --text-heading3-weight: 500;
+  --text-heading3-line-height: var(--text-line-height);
+  --text-heading3-letter-spacing: -0.4px;
+
+  /* subtitle */
+  --text-subtitle1-size: 18px;
+  --text-subtitle1-weight: 500;
+  --text-subtitle1-line-height: var(--text-line-height);
+  --text-subtitle1-letter-spacing: -0.36px;
+
+  --text-subtitle2-size: 16px;
+  --text-subtitle2-weight: 600;
+  --text-subtitle2-line-height: var(--text-line-height);
+  --text-subtitle2-letter-spacing: -0.32px;
+
+  --text-subtitle3-size: 14px;
+  --text-subtitle3-weight: 500;
+  --text-subtitle3-line-height: var(--text-line-height);
+  --text-subtitle3-letter-spacing: -0.28px;
+
+  --text-subtitle4-size: 12px;
+  --text-subtitle4-weight: 500;
+  --text-subtitle4-line-height: var(--text-line-height);
+  --text-subtitle4-letter-spacing: -0.24px;
+
+  /* caption */
+  --text-caption1-size: 12px;
+  --text-caption1-weight: 400;
+  --text-caption1-line-height: var(--text-line-height);
+  --text-caption1-letter-spacing: -0.24px;
+
+  --text-caption2-size: 11px;
+  --text-caption2-weight: 400;
+  --text-caption2-line-height: var(--text-line-height);
+  --text-caption2-letter-spacing: -0.22px;
+
+  /* body */
+  --text-body1-size: 16px;
+  --text-body1-weight: 400;
+  --text-body1-line-height: var(--text-line-height);
+  --text-body1-letter-spacing: -0.32px;
+
+  --text-body2-size: 14px;
+  --text-body2-weight: 400;
+  --text-body2-line-height: var(--text-line-height);
+  --text-body2-letter-spacing: -0.28px;
+
+  /* ===== Motion ===== */
+  --press-scale: 0.97;
+}

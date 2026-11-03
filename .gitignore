@@ -1,0 +1,43 @@
+# ─── 의존성 / 빌드 산출물 ───
+node_modules
+dist
+build/
+out/
+.vite
+
+# ─── 환경 / 로컬 설정 ───
+*.local
+.env
+.env.*.local
+
+# ─── 로그 ───
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── 테스트 커버리지 ───
+coverage/
+
+# ─── IDE / 에디터 ───
+.idea
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Claude Code / OMC (로컬 전용, 트래킹 X) ───
+.omc
+CLAUDE*.md
+.claude/agents/
+.claude/worktrees/
