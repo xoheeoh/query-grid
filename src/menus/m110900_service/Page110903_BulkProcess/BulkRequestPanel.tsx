@@ -4,17 +4,20 @@ import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { Banner, Button, Icon, IconButton, TextInput, Select } from "@xoheeoh/components";
 import { mdiArrowLeft, mdiFileArrowUpDownOutline, mdiFileCheckOutline } from "@mdi/js";
 import { useSubviewLock } from "@menus/SubviewLockContext";
-import { COL } from "@utils";
+import { COL, downloadExcelTemplate, exportGridToExcel } from "@utils";
 import styles from "./BulkRequestPanel.module.css";
 
 type BulkRequestPanelProps = {
   onClose: () => void;
 };
 
+/** 업로드 양식별 열 제목. 데모용 구성이며 파일 체크 결과 표의 입력 항목을 기준으로 한다. */
+const REFUND_TEMPLATE_HEADERS = ["상품권번호", "상품권ID", "고객명", "은행코드", "계좌번호"];
+
 const TEMPLATE_DOWNLOAD_OPTIONS = [
-  { value: "1", label: "환불 양식", fileName: "refund_template.xlsx" },
-  { value: "2", label: "만료일 연장 양식", fileName: "extend_expiry_template.xlsx" },
-  { value: "3", label: "대량구매 환불 양식", fileName: "bulk_purchase_refund_template.xlsx" },
+  { value: "1", label: "환불 양식", headers: REFUND_TEMPLATE_HEADERS },
+  { value: "2", label: "만료일 연장 양식", headers: ["상품권번호", "상품권ID", "고객명", "연장 만료일 (YYYY-MM-DD)"] },
+  { value: "3", label: "대량구매 환불 양식", headers: REFUND_TEMPLATE_HEADERS },
 ] as const;
 
 type FileCheckResultRow = {
@@ -67,8 +70,7 @@ const MOCK_ROWS: FileCheckResultRow[] = [
 ];
 
 async function downloadTemplate(option: (typeof TEMPLATE_DOWNLOAD_OPTIONS)[number]) {
-  // TODO: 실제 엑셀 파일 다운로드로 교체
-  console.log("양식 다운로드:", option.label, option.fileName);
+  await downloadExcelTemplate([...option.headers], option.label);
 }
 
 export default function BulkRequestPanel({ onClose }: BulkRequestPanelProps) {
@@ -89,7 +91,6 @@ export default function BulkRequestPanel({ onClose }: BulkRequestPanelProps) {
     setIsFileUploaded(true);
   };
 
-  // TODO: 실제 양식 다운로드 기능으로 교체
   const handleTemplateDownload = async (selectedValue: string) => {
     if (!selectedValue) return;
 
@@ -116,6 +117,11 @@ export default function BulkRequestPanel({ onClose }: BulkRequestPanelProps) {
   );
 
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true }), []);
+
+  const gridRef = useRef<AgGridReact<FileCheckResultRow>>(null);
+  const handleExcelDownload = () => {
+    if (gridRef.current) exportGridToExcel(gridRef.current.api, "파일 체크 결과");
+  };
 
   return (
     <div
@@ -209,13 +215,21 @@ export default function BulkRequestPanel({ onClose }: BulkRequestPanelProps) {
                     <span className="text-subtitle2">파일 체크 결과</span>
                   </div>
 
-                  <Button size="sm" variant="outlined" color="neutral" label="엑셀 다운로드" />
+                  <Button
+                    size="sm"
+                    variant="outlined"
+                    color="neutral"
+                    disabled={rowData.length === 0}
+                    onClick={handleExcelDownload}
+                    label="엑셀 다운로드"
+                  />
                 </div>
 
                 <div className="grid-panel" style={{ border: "none" }}>
                   <AgGridProvider modules={[AllCommunityModule]}>
                     <div className="ag-theme-alpine grid-fill-wrap">
                       <AgGridReact<FileCheckResultRow>
+                        ref={gridRef}
                         theme="legacy"
                         rowData={rowData}
                         columnDefs={columnDefs}

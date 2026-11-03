@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
-import { COL, toDateValue } from "@utils";
+import { COL, exportGridToExcel, toDateValue } from "@utils";
 import { Button, DateField, TextInput, Select } from "@xoheeoh/components";
 import TransferRequestPanel from "./TransferRequestPanel";
 
@@ -113,6 +113,11 @@ export default function GiftTransfer() {
 
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true }), []);
 
+  const gridRef = useRef<AgGridReact<GiftTransferRow>>(null);
+  const handleExcelDownload = () => {
+    if (gridRef.current) exportGridToExcel(gridRef.current.api, "상품권 양도");
+  };
+
   return (
     <div className="page-root">
       <div className="flex-between">
@@ -177,12 +182,20 @@ export default function GiftTransfer() {
       <div className="grid-panel">
         <div className="flex-between">
           <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")}건</span>
-          <Button size="sm" variant="outlined" color="neutral" onClick={() => {}} label="엑셀 다운로드" />
+          <Button
+            size="sm"
+            variant="outlined"
+            color="neutral"
+            disabled={rowData.length === 0}
+            onClick={handleExcelDownload}
+            label="엑셀 다운로드"
+          />
         </div>
 
         <AgGridProvider modules={[AllCommunityModule]}>
           <div className="ag-theme-alpine grid-fill-wrap">
             <AgGridReact<GiftTransferRow>
+              ref={gridRef}
               theme="legacy"
               rowData={rowData}
               columnDefs={columnDefs}

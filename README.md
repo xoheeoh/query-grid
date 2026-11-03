@@ -11,7 +11,8 @@ UI 컴포넌트는 직접 만들어 npm에 배포한 [`@xoheeoh/components`](htt
 
 - 로그인 (인증코드 입력, 비밀번호 변경 안내) → 메인
 - 메인: 왼쪽 메뉴 + 탭으로 여러 화면을 열어 두고 전환
-- 조회 화면: 조건 검색, 기간 선택, [AG Grid](https://www.ag-grid.com/) 목록, Excel 다운로드 버튼
+- 조회 화면: 조건 검색, 기간 선택, [AG Grid](https://www.ag-grid.com/) 목록
+- Excel 다운로드: 표에 보이는 그대로 .xlsx로 저장 (정렬·필터가 적용된 전체 행, 2단 헤더 병합, 고정 합계 행, 숫자 서식). 업로드용 빈 양식도 내려받을 수 있습니다.
 - 등록·수정 화면: 탭으로 나눈 입력 폼, 확인·실패 알림창
 
 | 주소 | 화면 |
@@ -49,6 +50,7 @@ npm run dev      # 개발 서버 (http://localhost:5180)
 - React 18, TypeScript, Vite 5
 - [`@xoheeoh/components`](https://www.npmjs.com/package/@xoheeoh/components) — Button, TextInput, Select, DateField, Dialog, Alert, Tabs 등
 - AG Grid — 목록 화면
+- [`write-excel-file`](https://www.npmjs.com/package/write-excel-file) — Excel 파일 생성 (AG Grid 무료 버전에는 Excel 내보내기가 없어서 사용)
 - `@mdi/js` — 아이콘
 
 ## 디렉터리 구조

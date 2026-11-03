@@ -1,7 +1,7 @@
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ColGroupDef, RowClassParams } from "ag-grid-community";
-import { COL, toDateValue } from "@utils";
+import { COL, exportGridToExcel, toDateValue } from "@utils";
 import { Button, DateField, Dialog } from "@xoheeoh/components";
 
 type SendingStatsRow = {
@@ -134,6 +134,11 @@ export default function SendingStats() {
 
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true }), []);
 
+  const gridRef = useRef<AgGridReact<SendingStatsRow>>(null);
+  const handleExcelDownload = () => {
+    if (gridRef.current) exportGridToExcel(gridRef.current.api, "발송 통계");
+  };
+
   const getRowClass = (params: RowClassParams<SendingStatsRow>) =>
     params.data?.isSummary ? "grid-row-summary" : undefined;
 
@@ -184,13 +189,21 @@ export default function SendingStats() {
           <div className="row-center gap-8">
             <span className="text-caption1 text-color-secondary">ⓘ 단가: 카카오 알림톡: 00.0원 / LMS: 00.0원</span>
             <Button size="sm" variant="outlined" color="neutral" onClick={() => setIsBasisModalOpen(true)} label="집계 기준" />
-            <Button size="sm" variant="outlined" color="neutral" onClick={() => {}} label="엑셀다운로드" />
+            <Button
+              size="sm"
+              variant="outlined"
+              color="neutral"
+              disabled={rowData.length === 0}
+              onClick={handleExcelDownload}
+              label="엑셀 다운로드"
+            />
           </div>
         </div>
 
         <AgGridProvider modules={[AllCommunityModule]}>
           <div className="ag-theme-alpine grid-fill-wrap">
             <AgGridReact<SendingStatsRow>
+              ref={gridRef}
               theme="legacy"
               rowData={rowData}
               pinnedTopRowData={pinnedTopRowData}
