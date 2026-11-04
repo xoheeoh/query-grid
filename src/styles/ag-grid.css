@@ -16,11 +16,12 @@
 
   --ag-foreground-color: var(--color-gray-900) !important;
   --ag-background-color: var(--color-white) !important;
-  --ag-border-color: var(--color-border-default) !important;
-  --ag-secondary-border-color: var(--color-border-default) !important;
-  --ag-header-background-color: color-mix(in srgb, var(--color-primary-800) 4%, white) !important;
+  --ag-border-color: var(--color-gray-100) !important;
+  --ag-secondary-border-color: var(--color-gray-100) !important;
+  --ag-header-background-color: var(--color-gray-50) !important;
   --ag-tooltip-background-color: var(--color-gray-50) !important;
-  --ag-odd-row-background-color: color-mix(in srgb, var(--color-gray-50) 55%, white) !important;
+  /* 줄무늬를 없애고 가로선만 옅게 둔다. */
+  --ag-odd-row-background-color: var(--color-white) !important;
   --ag-control-panel-background-color: var(--color-white) !important;
 
   --ag-invalid-color: var(--color-danger) !important;
@@ -34,11 +35,12 @@
   --ag-font-family: inherit !important;
   --ag-cell-horizontal-padding: 16px !important;
   --ag-header-column-separator-display: none !important;
-  --ag-row-border-color: var(--color-border-default) !important;
+  --ag-row-border-color: var(--color-gray-100) !important;
 }
 
+/* 머리글은 작고 회색으로 눌러서 본문 숫자가 먼저 보이게 한다. */
 .ag-header-row {
-  color: var(--color-gray-900) !important;
+  color: var(--color-gray-600) !important;
 }
 
 .ag-header-cell {
@@ -48,10 +50,22 @@
 
 .ag-header-cell-label,
 .ag-header-group-cell-label {
-  font-size: var(--text-subtitle3-size);
-  font-weight: var(--text-subtitle3-weight);
-  line-height: var(--text-subtitle3-line-height);
-  letter-spacing: var(--text-subtitle3-letter-spacing);
+  font-size: var(--text-caption1-size);
+  font-weight: 600;
+  line-height: var(--text-caption1-line-height);
+  letter-spacing: var(--text-caption1-letter-spacing);
+}
+
+/* 머리글 모서리를 둥글게 해서 흰 바탕 위에 띠처럼 보이게 한다. */
+.ag-header {
+  border-radius: var(--r-md);
+}
+
+/* 표 전체를 얇은 테두리로 감싼다. */
+.grid-fill-wrap {
+  border: 1px solid var(--color-gray-150);
+  border-radius: var(--r-lg);
+  padding: 6px 6px 8px;
 }
 
 .ag-header-left .ag-header-cell-label,
@@ -94,17 +108,24 @@
 }
 
 .ag-header {
-  border-bottom: 1px solid var(--color-border-default) !important;
+  border-bottom: none !important;
 }
 
 .ag-row {
-  border-bottom: 1px solid var(--color-border-default) !important;
+  border-bottom: 1px solid var(--color-gray-100) !important;
+}
+
+/* 오른쪽 고정 열(관리 버튼)은 경계선 대신 옅은 그림자로 구분한다. */
+.ag-pinned-right-header,
+.ag-pinned-right-cols-container {
+  border-left: none !important;
+  box-shadow: -6px 0 8px -6px rgba(16, 24, 40, 0.12);
 }
 
 .ag-paging-panel {
   border-top: none !important;
   justify-content: space-between !important;
-  padding: 8px 0 0 !important;
+  padding: 10px 4px 0 !important;
   height: auto !important;
   min-height: 28px;
   color: var(--color-gray-600) !important;
@@ -119,6 +140,13 @@
   flex: 1;
   min-height: 240px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 마지막 행 아래 선은 표 테두리와 겹쳐서 뺀다. */
+.ag-row:last-child {
+  border-bottom: none !important;
 }
 
 .ag-paging-page-size {
@@ -163,25 +191,9 @@
   min-height: 28px !important;
 }
 
-/* 총 건수 배지 */
-.grid-count-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 12px;
-  border-radius: var(--r-xs);
-  background: var(--color-blue-50);
-  color: var(--color-blue-500);
-  font-size: var(--text-caption1-size);
-  font-weight: 600;
-  line-height: var(--text-caption1-line-height);
-  letter-spacing: var(--text-caption1-letter-spacing);
-  width: fit-content;
-}
-
 /* 합계 등 상단 고정 요약 행 */
 .ag-row.grid-row-summary {
-  background-color: var(--color-yellow-50) !important;
+  background-color: color-mix(in srgb, var(--color-primary-800) 5%, white) !important;
   font-weight: 600;
 }
 
@@ -208,23 +220,32 @@
   height: 100%;
 }
 
-/* 상태 pill */
+/* 상태 표시. 앞에 작은 점을 찍고 글자는 진하게, 바탕은 옅게 둔다. */
 .status-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 4px 10px;
-  border-radius: var(--r-full);
+  gap: 6px;
+  padding: 2px 8px 2px 6px;
+  border-radius: var(--r-sm);
   font-size: var(--text-caption1-size);
-  font-weight: var(--text-caption1-weight);
+  font-weight: 500;
   line-height: var(--text-caption1-line-height);
   letter-spacing: var(--text-caption1-letter-spacing);
   white-space: nowrap;
 }
 
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: currentColor;
+  flex-shrink: 0;
+}
+
 .status-badge-success {
   background: var(--color-green-50);
-  color: var(--color-green-700);
+  color: var(--color-green-800);
 }
 
 .status-badge-danger {

@@ -23,9 +23,10 @@
   transition: background 0.1s ease-in-out;
 }
 
+/* 열린 탭은 아래 콘텐츠 바탕(흰색)과 같은 색이라 이어져 보인다. */
 .tabActive {
   color: var(--color-primary-800);
-  background: color-mix(in srgb, var(--color-primary-800) 6%, white);
+  background: var(--color-white);
 }
 
 .tabLabel {
@@ -73,5 +74,5 @@
 }
 
 .tabActive .closeButton:hover {
-  background: color-mix(in srgb, var(--color-primary-800) 12%, white);
+  background: var(--color-gray-200);
 }

@@ -173,11 +173,11 @@
 .contentBody {
   flex: 1;
   min-height: 0;
-  padding: 20px;
+  padding: 28px 32px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: color-mix(in srgb, var(--color-primary-800) 6%, white);
+  background: var(--color-white);
 }
 
 /* —— Header responsive —— */

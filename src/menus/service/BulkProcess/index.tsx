@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { COL, toDateValue } from "@utils";
-import { Button, Checkbox, CheckboxGroup, DateField, Select } from "@xoheeoh/components";
+import { Button, DateField, Select, TextButton } from "@xoheeoh/components";
 import BulkRequestPanel from "./BulkRequestPanel";
 
 const PROCESS_TYPE_OPTIONS = [
-  { label: "전체", value: "" },
+  { label: "전체", value: "all" },
   { label: "환불", value: "refund" },
   { label: "만료연장", value: "extend" },
   { label: "대량구매환불", value: "bulkRefund" },
@@ -21,8 +21,6 @@ const STATUS_OPTIONS = [
   { label: "요청완료", value: "completed" },
   { label: "요청취소", value: "canceled" },
 ] as const;
-
-const STATUS_VALUES = STATUS_OPTIONS.map((o) => o.value);
 
 function optionLabel(options: readonly { label: string; value: string }[], value: string | null | undefined) {
   if (value == null || value === "") return "";
@@ -83,30 +81,24 @@ function UnmaskingRenderer() {
 }
 
 export default function BulkProcess() {
-  const [processType, setProcessType] = useState<string>("");
+  const [processType, setProcessType] = useState<string>("all");
   const [dateRangeType, setDateRangeType] = useState<string>("requestDate");
   const [dayFrom, setDayFrom] = useState("");
   const [dayTo, setDayTo] = useState("");
   const [dayShortcut, setDayShortcut] = useState("today");
-  const [statuses, setStatuses] = useState<string[]>([...STATUS_VALUES]);
+  /** 고른 상태가 없으면 전체 조회 */
+  const [statuses, setStatuses] = useState<string[]>([]);
   const [rowData, setRowData] = useState<BulkProcessRow[]>([]);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
 
-  const allStatusesSelected = STATUS_VALUES.every((value) => statuses.includes(value));
-  const someStatusesSelected = statuses.length > 0 && !allStatusesSelected;
-
-  const handleToggleAllStatuses = (checked: boolean) => {
-    setStatuses(checked ? [...STATUS_VALUES] : []);
-  };
-
   const handleReset = () => {
     const today = toDateValue(new Date());
-    setProcessType("");
+    setProcessType("all");
     setDateRangeType("requestDate");
     setDayFrom(today);
     setDayTo(today);
     setDayShortcut("today");
-    setStatuses([...STATUS_VALUES]);
+    setStatuses([]);
     setRowData([]);
   };
 
@@ -150,81 +142,82 @@ export default function BulkProcess() {
 
   return (
     <div className="page-root">
-      <div className="flex-between">
+      <div className="page-header">
         <div className="page-title">
-          <h3 className="text-heading3">일괄 수기처리</h3>
-          <p className="text-body2 text-color-secondary">
-            대량의 환불/만료연장 요청 건을 엑셀 업로드를 통해 처리합니다.
-          </p>
+          <h3>일괄 수기처리</h3>
+          <p>대량의 환불/만료연장 요청 건을 엑셀 업로드를 통해 처리합니다.</p>
         </div>
 
         <Button onClick={() => setIsRequestOpen(true)} label="일괄 수기처리 요청" />
       </div>
 
-      <div className="filter-panel">
-        <div className="flex-between">
-          <span className="text-subtitle2">조회옵션</span>
-          <div className="row-center gap-8">
-            <Button size="sm" variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
-            <Button size="sm" onClick={handleSearch} label="조회" />
-          </div>
-        </div>
-
+      <div className="filter-bar">
         <div className="filter-fields">
-          <div className="table-item">
-            <span className="text-body2 table-item-label">처리구분</span>
+          <div className="filter-field">
+            <span className="filter-label">처리구분</span>
             <Select
+              size="sm"
+              aria-label="처리구분"
               options={PROCESS_TYPE_OPTIONS}
               value={processType}
-              onValueChange={(value) => setProcessType(value)}
-              className="table-item-value"
+              onValueChange={setProcessType}
+              style={{ width: 150 }}
             />
           </div>
 
-          <div className="table-item">
-            <span className="table-item-label">
+          <div className="filter-field">
+            <span className="filter-label">기간</span>
+            <div className="filter-group">
               <Select
+                size="sm"
+                aria-label="기간 기준"
                 options={DATE_RANGE_TYPE_OPTIONS}
                 value={dateRangeType}
-                onValueChange={(value) => setDateRangeType(value)}
+                onValueChange={setDateRangeType}
+                style={{ width: 130 }}
               />
-            </span>
-            <DateField
-              mode="range"
-              className="table-item-value"
-              from={dayFrom}
-              to={dayTo}
-              onFromChange={setDayFrom}
-              onToChange={setDayTo}
-              shortcut={dayShortcut}
-              onShortcutChange={setDayShortcut}
-              defaultToday
-            />
-          </div>
-
-          <div className="table-item" style={{ minHeight: 39 }}>
-            <span className="text-body2 table-item-label">상태</span>
-
-            <div className="row-center gap-12">
-              <Checkbox
-                label="전체"
-                checked={allStatusesSelected}
-                indeterminate={someStatusesSelected}
-                onChange={(e) => handleToggleAllStatuses(e.target.checked)}
-              />
-              <CheckboxGroup
-                direction="horizontal"
-                value={statuses}
-                onChange={setStatuses}
-                options={[...STATUS_OPTIONS]}
+              <DateField
+                size="sm"
+                mode="range"
+                from={dayFrom}
+                to={dayTo}
+                onFromChange={setDayFrom}
+                onToChange={setDayTo}
+                shortcut={dayShortcut}
+                onShortcutChange={setDayShortcut}
+                defaultToday
               />
             </div>
           </div>
+
+          <div className="filter-field">
+            <span className="filter-label">상태</span>
+            <Select
+              size="sm"
+              type="chip"
+              multiple
+              aria-label="상태"
+              placeholder="전체"
+              options={[...STATUS_OPTIONS]}
+              value={statuses}
+              onValueChange={setStatuses}
+              style={{ minWidth: 200 }}
+            />
+          </div>
+        </div>
+
+        <div className="filter-actions">
+          <TextButton size="sm" color="neutral" onClick={handleReset} label="초기화" />
+          <Button size="sm" onClick={handleSearch} label="조회" />
         </div>
       </div>
 
-      <div className="grid-panel">
-        <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")}건</span>
+      <div className="result-panel">
+        <div className="result-toolbar">
+          <span className="result-count">
+            총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+          </span>
+        </div>
 
         <AgGridProvider modules={[AllCommunityModule]}>
           <div className="ag-theme-alpine grid-fill-wrap">

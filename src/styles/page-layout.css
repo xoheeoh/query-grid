@@ -1,6 +1,11 @@
 /*
  * 조회형 페이지 공통 레이아웃
- * — 타이틀/액션 헤더, 조회옵션 패널, 결과 그리드 패널
+ *
+ *   page-header   제목 + 설명 (오른쪽에 주요 버튼)
+ *   filter-bar    조회 조건을 한 줄로 늘어놓은 도구막대. 끝에 초기화·조회
+ *   result-panel  건수·보조 버튼 줄 + 결과 표
+ *
+ * 바탕은 흰색 한 장이고, 조회 도구막대만 옅은 회색 띠로 구분한다.
  */
 
 /* 페이지 루트: contentBody 안에서 남은 높이를 채움 */
@@ -10,21 +15,130 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  gap: 20px;
+}
+
+/* ===== 제목 줄 ===== */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 16px;
 }
 
+/* 페이지 타이틀 블록 (제목 + 설명) */
+.page-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.page-title > h3 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.6px;
+  color: var(--color-gray-900);
+}
+
+.page-title > p {
+  font-size: var(--text-body2-size);
+  line-height: var(--text-body2-line-height);
+  letter-spacing: var(--text-body2-letter-spacing);
+  color: var(--color-gray-500);
+}
+
+/* ===== 조회 도구막대 ===== */
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding: 14px 16px;
+  background: var(--color-gray-50);
+  border-radius: var(--r-lg);
+}
+
 /*
- * Contents 영역 풀모달(서브뷰)
- * — 사이드바/탭 활성 메뉴는 유지한 채 contentBody만 덮음
- * — inset -20px: MainPage contentBody padding(20px) 상쇄
+ * 조건들을 감싸는 틀. 틀 자체는 배치에서 빠지고(display: contents) 조건들이 도구막대의 직접 자식처럼 놓인다.
+ * 그래야 좁은 화면에서 초기화·조회 버튼 폭까지 포함해 줄바꿈이 계산되고, 버튼은 마지막 줄 오른쪽에 붙는다.
  */
+.filter-fields {
+  display: contents;
+}
+
+/* 조건 하나: 작은 이름표 + 입력 */
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.filter-label {
+  padding-left: 2px;
+  font-size: var(--text-caption1-size);
+  font-weight: 500;
+  line-height: var(--text-caption1-line-height);
+  letter-spacing: var(--text-caption1-letter-spacing);
+  color: var(--color-gray-600);
+}
+
+/* 입력 두 개를 붙여 쓰는 조건 (기준 선택 + 검색어 등) */
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 초기화·조회. 조건이 여러 줄이어도 항상 오른쪽 아래 */
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* ===== 결과 ===== */
+.result-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 10px;
+}
+
+/* 건수(왼쪽) + 보조 버튼(오른쪽) */
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.result-count {
+  font-size: var(--text-body2-size);
+  line-height: var(--text-body2-line-height);
+  letter-spacing: var(--text-body2-letter-spacing);
+  color: var(--color-gray-600);
+}
+
+.result-count > strong {
+  font-weight: 700;
+  color: var(--color-gray-900);
+}
+
+/* ===== Contents 영역 풀모달(서브뷰) ===== */
+/* — 사이드바/탭 활성 메뉴는 유지한 채 contentBody만 덮음. inset은 contentBody 패딩 상쇄 */
 .page-subview {
   position: absolute;
-  inset: -20px;
+  inset: -28px -32px;
   z-index: 20;
   display: flex;
   flex-direction: column;
-  background: color-mix(in srgb, var(--color-primary-800) 6%, white);
+  background: var(--color-white);
   overflow: hidden;
 }
 
@@ -35,7 +149,7 @@
   flex: 1;
   min-height: 0;
   gap: 16px;
-  padding: 20px 20px 0;
+  padding: 28px 32px 0;
   overflow: hidden;
 }
 
@@ -60,6 +174,7 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+  padding: 4px 0 32px;
 }
 
 /* 서브뷰 고정 푸터 — 하단 full-bleed 흰색 바 */
@@ -69,44 +184,16 @@
   justify-content: space-between;
   flex-shrink: 0;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 12px 32px;
   background: var(--color-white);
-  border-top: 1px solid var(--color-border-default);
+  border-top: 1px solid var(--color-gray-150);
 }
 
-/* 페이지 타이틀 블록 (제목 + 설명) */
-.page-title {
+/* 서브뷰 안의 섹션 카드 (기본 정보, 판매처 지정 …). 흰 바탕이라 얇은 테두리로 구분한다. */
+.section-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-/* 조회옵션 카드 */
-.filter-panel {
-  display: grid;
-  gap: 16px;
-  padding: 16px;
   background: var(--color-white);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--r-md);
-}
-
-/* 조회옵션 필드 그리드 (2열) */
-.filter-fields {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 24px;
-}
-
-/* 결과 그리드 카드 */
-.grid-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  gap: 12px;
-  padding: 16px;
-  background: var(--color-white);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--r-md);
+  border: 1px solid var(--color-gray-150);
+  border-radius: var(--r-lg);
 }

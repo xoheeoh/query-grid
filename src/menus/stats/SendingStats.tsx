@@ -2,7 +2,7 @@ import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ColGroupDef, RowClassParams } from "ag-grid-community";
 import { COL, exportGridToExcel, toDateValue } from "@utils";
-import { Button, DateField, Dialog } from "@xoheeoh/components";
+import { Button, DateField, Dialog, TextButton } from "@xoheeoh/components";
 
 type SendingStatsRow = {
   id: number;
@@ -144,28 +144,20 @@ export default function SendingStats() {
 
   return (
     <div className="page-root">
-      <div className="page-title">
-        <h3 className="text-heading3">알림 발송 통계</h3>
-        <p className="text-body2 text-color-secondary">
-          시스템에서 발송된 문자(알림톡, LMS 등)의 발송 통계를 조회합니다.
-        </p>
+      <div className="page-header">
+        <div className="page-title">
+          <h3>알림 발송 통계</h3>
+          <p>시스템에서 발송된 문자(알림톡, LMS 등)의 발송 통계를 조회합니다.</p>
+        </div>
       </div>
 
-      <div className="filter-panel">
-        <div className="flex-between">
-          <span className="text-subtitle2">조회옵션</span>
-          <div className="row-center gap-8">
-            <Button size="sm" variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
-            <Button size="sm" onClick={handleSearch} label="조회" />
-          </div>
-        </div>
-
+      <div className="filter-bar">
         <div className="filter-fields">
-          <div className="table-item">
-            <span className="text-body2 table-item-label">기간</span>
+          <div className="filter-field">
+            <span className="filter-label">기간</span>
             <DateField
+              size="sm"
               mode="range"
-              className="table-item-value"
               from={dayFrom}
               to={dayTo}
               onFromChange={setDayFrom}
@@ -175,12 +167,19 @@ export default function SendingStats() {
             />
           </div>
         </div>
+
+        <div className="filter-actions">
+          <TextButton size="sm" color="neutral" onClick={handleReset} label="초기화" />
+          <Button size="sm" onClick={handleSearch} label="조회" />
+        </div>
       </div>
 
-      <div className="grid-panel">
-        <div className="flex-between">
-          <div className="row-center gap-8">
-            <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")} 건</span>
+      <div className="result-panel">
+        <div className="result-toolbar">
+          <div className="row-center gap-12">
+            <span className="result-count">
+              총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+            </span>
             <span className="text-caption1 text-color-danger">
               ⓘ 대량선물 건수에는 자동생성 건수가 포함되어있습니다.
             </span>

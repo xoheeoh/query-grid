@@ -6,13 +6,12 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
 import { COL } from "@utils";
-import { Button, Checkbox, CheckboxGroup, TextInput, Select } from "@xoheeoh/components";
+import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
 import VoucherRegisterPanel from "./register/VoucherRegisterPanel";
 import VoucherEditPanel from "./edit/VoucherEditPanel";
 import {
   PUBLISHER_OPTIONS,
   SELLER_OPTIONS,
-  STATUS_CODES,
   STATUS_LABEL,
   STATUS_OPTIONS,
   optionLabel,
@@ -124,14 +123,12 @@ const SELLER_FILTER_OPTIONS = withAllOption(SELLER_OPTIONS);
 export default function VoucherManage() {
   const [publisher, setPublisher] = useState<string>("all");
   const [seller, setSeller] = useState<string>("all");
-  const [status, setStatus] = useState<string[]>([...STATUS_CODES]);
+  /** 고른 상태가 없으면 전체 조회 */
+  const [status, setStatus] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
   const [rowData, setRowData] = useState<VoucherRow[]>([]);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState<VoucherRow | null>(null);
-
-  const allStatusSelected = STATUS_CODES.every((v) => status.includes(v));
-  const someStatusSelected = status.length > 0 && !allStatusSelected;
 
   const handleEdit = (row: VoucherRow) => {
     setEditingVoucher(row);
@@ -172,7 +169,7 @@ export default function VoucherManage() {
   const handleReset = () => {
     setPublisher("all");
     setSeller("all");
-    setStatus([...STATUS_CODES]);
+    setStatus([]);
     setSearch("");
     setRowData([]);
   };
@@ -184,7 +181,7 @@ export default function VoucherManage() {
     const filtered = MOCK_ROWS.filter((row) => {
       if (publisherName && row.publisher !== publisherName) return false;
       if (sellerName && row.seller !== sellerName) return false;
-      if (!row.status.some((s) => status.includes(s))) return false;
+      if (status.length > 0 && !row.status.some((s) => status.includes(s))) return false;
       if (!keyword) return true;
       return row.seller.includes(keyword) || row.voucherName.includes(keyword);
     });
@@ -199,86 +196,83 @@ export default function VoucherManage() {
 
   return (
     <div className="page-root">
-      <div className="flex-between">
+      <div className="page-header">
         <div className="page-title">
-          <h3 className="text-heading3">상품권 관리</h3>
-          <p className="text-body2 text-color-secondary">플랫폼을 통해 발행 될 상품권을 등록 및 관리합니다.</p>
+          <h3>상품권 관리</h3>
+          <p>플랫폼을 통해 발행 될 상품권을 등록 및 관리합니다.</p>
         </div>
 
         <Button onClick={() => setIsRegisterOpen(true)} label="상품권 등록" />
       </div>
 
-      <div className="filter-panel">
-        <div className="flex-between">
-          <span className="text-subtitle2">조회옵션</span>
-          <div className="row-center gap-8">
-            <Button size="sm" variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
-            <Button size="sm" onClick={handleSearch} label="조회" />
-          </div>
-        </div>
-
+      <div className="filter-bar">
         <div className="filter-fields">
-          <div className="table-item">
-            <span className="text-body2 table-item-label">발행처</span>
+          <div className="filter-field">
+            <span className="filter-label">발행처</span>
             <Select
+              size="sm"
               aria-label="발행처"
               options={PUBLISHER_FILTER_OPTIONS}
               value={publisher}
-              onValueChange={(value) => setPublisher(value)}
-              className="table-item-value"
+              onValueChange={setPublisher}
+              style={{ width: 170 }}
             />
           </div>
 
-          <div className="table-item">
-            <span className="text-body2 table-item-label">판매처</span>
+          <div className="filter-field">
+            <span className="filter-label">판매처</span>
             <Select
+              size="sm"
               aria-label="판매처"
               options={SELLER_FILTER_OPTIONS}
               value={seller}
-              onValueChange={(value) => setSeller(value)}
-              className="table-item-value"
+              onValueChange={setSeller}
+              style={{ width: 170 }}
             />
           </div>
 
-          {/* 선택지가 5개라 반 칸에는 안 들어가서 한 줄을 통으로 쓴다. */}
-          <div className="table-item grid-col-full">
-            <span className="text-body2 table-item-label">상태</span>
-            <div className="row-start gap-12">
-              <Checkbox
-                label="전체"
-                labelStyle={{ whiteSpace: "nowrap" }}
-                checked={allStatusSelected}
-                indeterminate={someStatusSelected}
-                onChange={(e) => setStatus(e.target.checked ? [...STATUS_CODES] : [])}
-              />
-              <CheckboxGroup
-                aria-label="상태"
-                name="status"
-                value={status}
-                onChange={setStatus}
-                direction="horizontal"
-                options={STATUS_OPTIONS}
-              />
-            </div>
+          <div className="filter-field">
+            <span className="filter-label">상태</span>
+            <Select
+              size="sm"
+              type="chip"
+              multiple
+              aria-label="상태"
+              placeholder="전체"
+              options={STATUS_OPTIONS}
+              value={status}
+              onValueChange={setStatus}
+              style={{ minWidth: 220 }}
+            />
           </div>
 
-          <div className="table-item">
-            <span className="text-body2 table-item-label">검색어</span>
+          <div className="filter-field">
+            <span className="filter-label">검색어</span>
             <TextInput
+              size="sm"
               aria-label="검색어"
               type="search"
-              placeholder="판매처명, 상품권명을 입력해 주세요."
-              className="table-item-value"
+              placeholder="판매처명, 상품권명"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              style={{ width: 240 }}
             />
           </div>
         </div>
+
+        <div className="filter-actions">
+          <TextButton size="sm" color="neutral" onClick={handleReset} label="초기화" />
+          <Button size="sm" onClick={handleSearch} label="조회" />
+        </div>
       </div>
 
-      <div className="grid-panel">
-        <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")} 건</span>
+      <div className="result-panel">
+        <div className="result-toolbar">
+          <span className="result-count">
+            총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+          </span>
+        </div>
 
         <AgGridProvider modules={[AllCommunityModule]}>
           <div className="ag-theme-alpine grid-fill-wrap">

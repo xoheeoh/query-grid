@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { COL, exportGridToExcel, toDateValue } from "@utils";
-import { Button, DateField, TextInput, Select } from "@xoheeoh/components";
+import { Button, DateField, TextButton, TextInput, Select } from "@xoheeoh/components";
 import TransferRequestPanel from "./TransferRequestPanel";
 
 type GiftTransferRow = {
@@ -120,30 +120,22 @@ export default function GiftTransfer() {
 
   return (
     <div className="page-root">
-      <div className="flex-between">
+      <div className="page-header">
         <div className="page-title">
-          <h3 className="text-heading3">상품권 양도</h3>
-          <p className="text-body2 text-color-secondary">회원/판매처 간 상품권 양도 내역을 조회 및 관리합니다.</p>
+          <h3>상품권 양도</h3>
+          <p>회원/판매처 간 상품권 양도 내역을 조회 및 관리합니다.</p>
         </div>
 
         <Button onClick={() => setIsRequestOpen(true)} label="상품권 양도 요청" />
       </div>
 
-      <div className="filter-panel">
-        <div className="flex-between">
-          <span className="text-subtitle2">조회옵션</span>
-          <div className="row-center gap-8">
-            <Button size="sm" variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
-            <Button size="sm" onClick={handleSearch} label="조회" />
-          </div>
-        </div>
-
+      <div className="filter-bar">
         <div className="filter-fields">
-          <div className="table-item">
-            <span className="text-body2 table-item-label">양도 요청일</span>
+          <div className="filter-field">
+            <span className="filter-label">양도 요청일</span>
             <DateField
+              size="sm"
               mode="range"
-              className="table-item-value"
               from={dayFrom}
               to={dayTo}
               onFromChange={setDayFrom}
@@ -154,34 +146,45 @@ export default function GiftTransfer() {
             />
           </div>
 
-          <div className="table-item">
-            <span className="text-body2 table-item-label">고객</span>
-            <div className="row-center gap-8 table-item-value">
+          <div className="filter-field">
+            <span className="filter-label">고객</span>
+            <div className="filter-group">
               <Select
+                size="sm"
+                aria-label="고객 검색 기준"
                 options={[
                   { label: "이름", value: "name" },
                   { label: "휴대폰번호", value: "phone" },
                 ]}
                 value={searchType}
-                onValueChange={(value) => setSearchType(value)}
-                style={{ minWidth: 140 }}
+                onValueChange={setSearchType}
+                style={{ width: 120 }}
               />
               <TextInput
-                placeholder="검색어를 입력해 주세요."
+                size="sm"
+                aria-label="고객 검색어"
+                placeholder="검색어"
                 type="search"
-                className="table-item-value"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                style={{ width: 200 }}
               />
             </div>
           </div>
         </div>
+
+        <div className="filter-actions">
+          <TextButton size="sm" color="neutral" onClick={handleReset} label="초기화" />
+          <Button size="sm" onClick={handleSearch} label="조회" />
+        </div>
       </div>
 
-      <div className="grid-panel">
-        <div className="flex-between">
-          <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")}건</span>
+      <div className="result-panel">
+        <div className="result-toolbar">
+          <span className="result-count">
+            총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+          </span>
           <Button
             size="sm"
             variant="outlined"

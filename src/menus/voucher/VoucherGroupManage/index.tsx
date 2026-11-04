@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ICellRendererParams } from "ag-grid-community";
 
-import { Button, TextInput, Select } from "@xoheeoh/components";
+import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
 import { COL } from "@utils";
 import VoucherGroupEditPanel from "./edit/VoucherGroupEditPanel";
 import VoucherGroupRegisterPanel from "./register/VoucherGroupRegisterPanel";
@@ -110,51 +110,56 @@ export default function VoucherGroupManage() {
 
   return (
     <div className="page-root">
-      <div className="flex-between">
+      <div className="page-header">
         <div className="page-title">
-          <h3 className="text-heading3">상품권 그룹 관리</h3>
-          <p className="text-body2 text-color-secondary">발행처별 상품권 그룹을 등록 및 관리합니다.</p>
+          <h3>상품권 그룹 관리</h3>
+          <p>발행처별 상품권 그룹을 등록 및 관리합니다.</p>
         </div>
 
         <Button onClick={() => setIsRegisterOpen(true)} label="상품권 그룹 등록" />
       </div>
 
-      <div className="filter-panel">
-        <div className="flex-between">
-          <span className="text-subtitle2">조회옵션</span>
-          <div className="row-center gap-8">
-            <Button size="sm" variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
-            <Button size="sm" onClick={handleSearch} label="조회" />
-          </div>
-        </div>
-
+      <div className="filter-bar">
         <div className="filter-fields">
-          <div className="table-item">
-            <span className="text-body2 table-item-label">발행처</span>
+          <div className="filter-field">
+            <span className="filter-label">발행처</span>
             <Select
+              size="sm"
+              aria-label="발행처"
               options={PUBLISHER_OPTIONS}
               value={publisher}
-              onValueChange={(value) => setPublisher(value)}
-              className="table-item-value"
+              onValueChange={setPublisher}
+              style={{ width: 170 }}
             />
           </div>
 
-          <div className="table-item">
-            <span className="text-body2 table-item-label">검색어</span>
+          <div className="filter-field">
+            <span className="filter-label">검색어</span>
             <TextInput
+              size="sm"
+              aria-label="검색어"
               type="search"
-              placeholder="상품권 그룹명을 입력해 주세요."
-              className="table-item-value"
+              placeholder="상품권 그룹명"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              style={{ width: 240 }}
             />
           </div>
         </div>
+
+        <div className="filter-actions">
+          <TextButton size="sm" color="neutral" onClick={handleReset} label="초기화" />
+          <Button size="sm" onClick={handleSearch} label="조회" />
+        </div>
       </div>
 
-      <div className="grid-panel">
-        <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")} 건</span>
+      <div className="result-panel">
+        <div className="result-toolbar">
+          <span className="result-count">
+            총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+          </span>
+        </div>
 
         <AgGridProvider modules={[AllCommunityModule]}>
           <div className="ag-theme-alpine grid-fill-wrap">
