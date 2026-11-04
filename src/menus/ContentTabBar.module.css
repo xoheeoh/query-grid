@@ -5,7 +5,7 @@
   gap: 0;
   min-height: 36px;
   padding: 6px 4px 0 4px;
-  background: var(--color-primary-900);
+  background: var(--color-gray-100);
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -44,8 +44,8 @@
 }
 
 .tab:hover:not(.tabActive) {
-  color: var(--color-primary-600);
-  background: color-mix(in srgb, var(--color-primary-800) 20%, white);
+  color: var(--color-gray-900);
+  background: var(--color-gray-200);
 }
 
 .closeButton {
@@ -69,7 +69,7 @@
 
 .closeButton:hover {
   opacity: 1;
-  background: var(--color-primary-200);
+  background: var(--color-gray-300);
 }
 
 .tabActive .closeButton:hover {

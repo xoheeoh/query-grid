@@ -1,5 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Alert, Banner, Button, Checkbox, Dialog, TextInput } from "@xoheeoh/components";
+import { saveLoginSession } from "@utils";
 
 const OTP_DURATION_SEC = 4 * 60 + 59; // 04:59
 
@@ -9,6 +10,7 @@ const OTP_DURATION_SEC = 4 * 60 + 59; // 04:59
  */
 const DEMO_ACCOUNT = {
   id: "demo",
+  name: "홍길동",
   password: "demo1234",
   otp: "000000",
 };
@@ -17,6 +19,12 @@ function formatRemainTime(seconds: number) {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/** 로그인 성공 처리. 사용자 정보와 접속 시각을 저장하고 메인 화면으로 이동한다. */
+function goToMain() {
+  saveLoginSession({ id: DEMO_ACCOUNT.id, name: DEMO_ACCOUNT.name });
+  window.location.assign("/sample");
 }
 
 /** 로그인 화면 — 성공 시 /sample(MainPage)로 이동 */
@@ -93,7 +101,7 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.assign("/sample");
+    goToMain();
   };
 
   const handleResendOtp = () => {
@@ -127,7 +135,7 @@ export default function LoginPage() {
 
   const handleAlertClose = () => {
     setAlertMessage(null);
-    if (moveToMainOnAlertClose) window.location.assign("/sample");
+    if (moveToMainOnAlertClose) goToMain();
   };
 
   return (

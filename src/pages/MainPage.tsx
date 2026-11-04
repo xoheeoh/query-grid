@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { mdiAccountOutline, mdiChevronRight, mdiClipboardTextOutline } from "@mdi/js";
+import { useState } from "react";
+import { mdiAccountOutline, mdiChevronRight } from "@mdi/js";
 import { Alert, Icon, ToastProvider } from "@xoheeoh/components";
 import { Sidebar, SidebarGroup, SidebarItem } from "../layout/Sidebar";
+import { clearLoginSession, getLoginSession } from "@utils";
 import {
   ContentTabBar,
   DASHBOARD_TAB_ID,
@@ -35,9 +36,8 @@ function MainPageContent() {
   /** 서브뷰 잠금 중 화면 이동 대기 — 탭 전환·사이드바 메뉴 클릭 확인 Dialog용 */
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
   const { isLocked } = useSubviewLockState();
-
-  const [alertCount] = useState(7);
-  const [isBadgeVisible, setIsBadgeVisible] = useState(true);
+  // 로그인 화면에서 저장한 사용자 정보. 로그인 없이 바로 들어오면 없다.
+  const session = getLoginSession();
 
   const isDashboard = activeTab === null || activeTab === DASHBOARD_TAB_ID;
   const currentPageLabel = isDashboard || !activeTab || !isMenuId(activeTab) ? "대시보드" : MENU_LABEL[activeTab];
@@ -45,14 +45,6 @@ function MainPageContent() {
     isDashboard || !activeTab || !isMenuId(activeTab)
       ? "홈 > 대시보드"
       : `홈 > ${getMenuGroupTitle(activeTab)} > ${MENU_LABEL[activeTab]}`;
-
-  useEffect(() => {
-    if (alertCount > 0) {
-      setIsBadgeVisible(true);
-    } else {
-      setIsBadgeVisible(false);
-    }
-  }, [alertCount]);
 
   /** 탭이 열려 있으면 대시보드를 탭으로 추가. 탭이 없으면 암묵적 대시보드만 표시 */
   function openDashboard() {
@@ -124,8 +116,8 @@ function MainPageContent() {
     setPendingTab(null);
   }
 
-  // TODO: 실제 로그아웃 로직으로 변경
   function handleLogout() {
+    clearLoginSession();
     window.location.href = "/";
   }
 
@@ -134,7 +126,7 @@ function MainPageContent() {
       <header className={styles.header}>
         <div className={`${styles.headerInfoContainer} ${styles.headerLeading}`}>
           <button type="button" className={styles.brand} onClick={openDashboard} aria-label="대시보드로 이동">
-            <img src="/img/logo.svg" alt="" />
+            <img src="/img/logo_color.svg" alt="" width={24} height={24} />
             <div className={styles.brandText}>
               <span className={`text-subtitle2 ${styles.brandTitle}`}>바우처 플랫폼</span>
               <span className={`text-caption1 ${styles.brandBadge}`}>Admin</span>
@@ -146,11 +138,11 @@ function MainPageContent() {
           <div className={styles.breadcrumbPath} title={breadcrumbTitle}>
             <span className={styles.breadcrumbAncestors}>
               <span className={`text-body2 ${styles.label}`}>홈</span>
-              <Icon path={mdiChevronRight} size={14} color="rgba(255, 255, 255, 0.5)" />
+              <Icon path={mdiChevronRight} size={14} className={styles.breadcrumbChevron} />
               {!isDashboard && activeTab && isMenuId(activeTab) && (
                 <>
                   <span className={`text-body2 ${styles.label}`}>{getMenuGroupTitle(activeTab)}</span>
-                  <Icon path={mdiChevronRight} size={14} color="rgba(255, 255, 255, 0.5)" />
+                  <Icon path={mdiChevronRight} size={14} className={styles.breadcrumbChevron} />
                 </>
               )}
             </span>
@@ -159,63 +151,25 @@ function MainPageContent() {
         </div>
 
         <div className={`${styles.headerInfoContainer} ${styles.headerTrailing}`}>
-          <div className={styles.headerInfo}>
-            <div className={`${styles.headerInfoItem} ${styles.lastLogin}`}>
-              <span className={`text-caption2 ${styles.label}`}>최근 접속</span>
-              <div className={styles.headerInfoValue}>
-                <span className="text-caption1">
-                  <strong>2025-05-20 08:42</strong>
-                </span>
-              </div>
-            </div>
-
-            <div className={`${styles.headerInfoItem} ${styles.sessionInfo}`}>
-              <span className={`text-caption2 ${styles.label} ${styles.sessionLabel}`}>세션 잔여</span>
-              <div className={styles.headerInfoValue}>
-                <span className="text-caption1">
-                  <strong className={styles.time}>18 : 30</strong>
-                </span>
-                <button type="button" className={styles.timeButton}>
-                  <span className="text-caption2">
-                    <strong>연장</strong>
-                  </span>
-                </button>
-              </div>
-            </div>
+          <div className={`${styles.headerInfoItem} ${styles.lastLogin}`}>
+            <span className={`text-caption2 ${styles.label}`}>최근 접속</span>
+            <span className="text-caption1">
+              <strong>{session?.loginAt ?? "-"}</strong>
+            </span>
           </div>
 
           <div className={`${styles.divider} ${styles.headerDividerMeta}`} />
 
           <div className={styles.headerAvatarInfo} tabIndex={0} aria-label="사용자 정보">
             <div className={styles.avatar}>
-              <Icon path={mdiAccountOutline} color="rgba(255, 255, 255, 0.8)" size={20} />
+              <Icon path={mdiAccountOutline} size={20} />
             </div>
 
             <div className={`${styles.headerInfoItem} ${styles.headerMetaText}`}>
-              <span className={`text-caption2 ${styles.label}`}>demotest0m</span>
-              <div className={styles.headerInfoValue}>
-                <span className="text-caption1">
-                  <strong>홍길동</strong>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className={`${styles.divider} ${styles.headerDividerMeta}`} />
-
-          <div className={styles.headerAvatarInfo} tabIndex={0} aria-label={`보관함 ${alertCount}건 대기`}>
-            <div className={styles.avatar}>
-              {isBadgeVisible && <div className={styles.badge}>{alertCount > 99 ? "99+" : alertCount}</div>}
-              <Icon path={mdiClipboardTextOutline} color="rgba(255, 255, 255, 0.8)" size={20} />
-            </div>
-
-            <div className={`${styles.headerInfoItem} ${styles.headerMetaText}`}>
-              <span className={`text-caption2 ${styles.label}`}>보관함</span>
-              <div className={styles.headerInfoValue}>
-                <span className="text-caption1">
-                  <strong>{alertCount}건 대기</strong>
-                </span>
-              </div>
+              <span className={`text-caption2 ${styles.label}`}>{session?.id ?? "-"}</span>
+              <span className="text-caption1">
+                <strong>{session?.name ?? "-"}</strong>
+              </span>
             </div>
           </div>
         </div>
