@@ -56,11 +56,14 @@ export function SidebarGroup({ title, icon, children }: SidebarGroupProps) {
       </button>
 
       <div id={panelId} className={styles.panel} data-open={open}>
-        {/* 아이콘만 보이는 좁은 화면의 플라이아웃에서만 보이는 제목이다. 버튼이 이미 이름을 읽어주므로 숨긴다. */}
-        <p className={styles.flyoutTitle} aria-hidden>
-          {title}
-        </p>
-        <ul className={styles.itemList}>{children}</ul>
+        {/* 접고 펼 때 높이가 부드럽게 바뀌도록 내용물을 한 번 더 감싼다. */}
+        <div className={styles.panelInner}>
+          {/* 아이콘만 보이는 좁은 화면의 플라이아웃에서만 보이는 제목이다. 버튼이 이미 이름을 읽어주므로 숨긴다. */}
+          <p className={styles.flyoutTitle} aria-hidden>
+            {title}
+          </p>
+          <ul className={styles.itemList}>{children}</ul>
+        </div>
       </div>
     </li>
   );

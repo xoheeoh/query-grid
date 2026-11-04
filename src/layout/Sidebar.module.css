@@ -70,8 +70,44 @@
   transform: rotate(180deg);
 }
 
+/*
+ * 접고 펼 때 높이가 부드럽게 바뀐다.
+ * 높이를 0fr ↔ 1fr로 바꾸는 grid 방식이라 내용물 높이를 자바스크립트로 재지 않아도 된다.
+ */
+.panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 0.2s ease,
+    visibility 0s;
+}
+
+.panelInner {
+  min-height: 0;
+  overflow: hidden;
+  transition: opacity 0.15s ease;
+}
+
+/* 접힘: 높이를 0으로 줄이고, 다 줄어든 뒤에 숨겨서 키보드 탭 순서에서도 빠지게 한다. */
 .panel[data-open="false"] {
-  display: none;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.2s ease,
+    visibility 0s 0.2s;
+}
+
+.panel[data-open="false"] .panelInner {
+  opacity: 0;
+}
+
+/* 움직임 줄이기를 켠 사용자에게는 즉시 접고 편다. 접힌 상태 규칙이 더 구체적이라 그 선택자도 같이 적는다. */
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-open="false"],
+  .panelInner {
+    transition: none;
+  }
 }
 
 .flyoutTitle {
@@ -148,10 +184,13 @@
     position: relative;
   }
 
-  /* 접힘 상태와 관계없이 기본은 숨기고, 마우스를 올리거나 포커스가 들어오면 보여준다. */
+  /* 접힘 상태와 관계없이 기본은 숨기고, 마우스를 올리거나 포커스가 들어오면 보여준다. 높이 애니메이션은 쓰지 않는다. */
   .panel,
   .panel[data-open="false"] {
     display: none;
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: none;
     position: absolute;
     top: 0;
     left: 100%;
@@ -166,6 +205,10 @@
   .group:hover .panel,
   .group:focus-within .panel {
     display: block;
+  }
+
+  .panel[data-open="false"] .panelInner {
+    opacity: 1;
   }
 
   .flyoutTitle {
