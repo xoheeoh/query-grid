@@ -140,7 +140,7 @@ menus/service/BulkProcess/
 
 menus/voucher/VoucherManage/
   index.tsx
-  edit/ … register/ …       ← 하위 패널·모달
+  form/                     ← 등록·수정이 같이 쓰는 폼 (탭 패널, 한도 모달)
 ```
 
 ### 4. import는 alias path 사용

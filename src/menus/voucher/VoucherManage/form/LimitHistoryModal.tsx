@@ -3,7 +3,7 @@ import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-gr
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { COL, formatThousandInput, parseThousandInput, toDateValue } from "@utils";
 import { Banner, Button, DateField, Dialog, TextInput, Select } from "@xoheeoh/components";
-import styles from "../../VoucherManagePanel.module.css";
+import styles from "../VoucherManagePanel.module.css";
 
 /** 어떤 한도(또는 기간)를 관리하는 모달인지 */
 export type LimitModalKind = "annualIssuance" | "annualDiscount" | "monthlyDiscountPurchase" | "purchaseCancelPeriod";

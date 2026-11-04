@@ -5,10 +5,9 @@ import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-gr
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import { COL } from "@utils";
+import { COL, formatThousandInput } from "@utils";
 import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
-import VoucherRegisterPanel from "./register/VoucherRegisterPanel";
-import VoucherEditPanel from "./edit/VoucherEditPanel";
+import { VoucherFormPanel, type VoucherFormValues } from "./form";
 import {
   PUBLISHER_OPTIONS,
   SELLER_OPTIONS,
@@ -76,6 +75,37 @@ const MOCK_ROWS: VoucherRow[] = [
   makeRow(17, "전라남도", "플랫폼 운영기관", "전남섬여행바우처", ["1"], 1_800_000_000, 0.39),
   makeRow(18, "중소벤처기업부", "사아자페이", "온누리상품권 (모바일)", ["3", "4"], 60_000_000_000, 1.0),
 ];
+
+/** 수정 화면에 보여줄 샘플 이미지 */
+const SAMPLE_VOUCHER_IMAGE = "/img/upload_sample.jpg";
+
+/** 목록 한 줄을 수정 폼의 값으로 바꾼다. 목록에 없는 항목은 데모용 예시 값으로 채운다. */
+function toFormValues(row: VoucherRow): VoucherFormValues {
+  const sellerValue = SELLER_OPTIONS.find((option) => option.label === row.seller)?.value;
+  return {
+    basic: {
+      publisher: PUBLISHER_OPTIONS.find((option) => option.label === row.publisher)?.value ?? "",
+      voucherName: row.voucherName,
+      category: "1",
+      imageUrl: SAMPLE_VOUCHER_IMAGE,
+      voucherDescription: `${row.voucherName} 전자상품권입니다.`,
+      validityType: "1",
+      validityPeriod: "5",
+      contactPhone: "15881234",
+      // 목록은 원 단위, 폼은 천원 단위
+      annualIssuanceLimit: formatThousandInput(String(row.annualIssuanceLimit / 1000)),
+      monthlyPurchaseLimit: "1,000",
+      purchaseDiscountRate: "10.0",
+      purchaseCancelPeriod: "7",
+    },
+    sale: sellerValue
+      ? {
+          selectedChannels: [sellerValue],
+          limits: { [sellerValue]: { saleLimit: "50,000", discountLimit: "20,000" } },
+        }
+      : {},
+  };
+}
 
 function isSuccessStatus(status: string) {
   return status === "1" || status === "2";
@@ -299,81 +329,9 @@ export default function VoucherManage() {
         </AgGridProvider>
       </div>
 
-      {isRegisterOpen && <VoucherRegisterPanel onClose={handleCloseRegister} />}
+      {isRegisterOpen && <VoucherFormPanel mode="register" onClose={handleCloseRegister} />}
       {editingVoucher && (
-        <VoucherEditPanel
-          /* 수정화면용 임시 데이터 */
-          initialData={{
-            id: editingVoucher.id,
-            publisher: editingVoucher.publisher,
-            seller: editingVoucher.seller,
-            voucherName: editingVoucher.voucherName,
-            annualIssuanceLimit: editingVoucher.annualIssuanceLimit,
-            annualDiscountLimit: editingVoucher.annualDiscountLimit,
-            authKey: "1s458f135wNR0026",
-
-            // 기본 정보
-            category: "1",
-            basicAttributes: ["1"],
-            appDisplayType: "1",
-            appDisplayName: editingVoucher.voucherName,
-            voucherDescription: `${editingVoucher.voucherName} 전자상품권입니다.`,
-            usageDescription: "전통시장 및 지정 가맹점에서 사용 가능합니다.",
-            validityType: "1",
-            validityPeriod: "5",
-            pinValidityPeriod: "7",
-            contactPhone: "15881234",
-
-            // 기본 정책
-            depositBusinessFund: "1,200,000,000",
-            remainingBusinessFund: "850,000,000",
-            holdingLimit: "2,000",
-            personalPurchaseAvailable: "on",
-            monthlyPurchaseLimit: "1,000",
-            fullWithdrawSubsidyDeduction: "off",
-            monthlyDiscountPurchaseLimit: "500",
-            purchaseDiscountRate: "10.0",
-            defaultMonthlySettlementLimit: "3,000",
-            purchaseCancelPeriod: "7",
-            monthlyGiftLimitType: "1",
-            personalGiftLimit: "300",
-            corporateGiftLimit: "1,000",
-            unifiedGiftLimit: "500",
-
-            // 환불기준 사용률
-            refundRateOver10k: "60",
-            refundRateUnder10k: "80",
-
-            // 가맹점 수수료
-            merchantFeeCode1: "0.5",
-            merchantFeeCode2: "0.8",
-            merchantFeeCode3: "1.0",
-            merchantFeeCode4: "1.2",
-            merchantFeeCodeN: "1.5",
-
-            // 수수료 설정
-            purchaseRefundFee: "0.0",
-            expireRefundFee: "0.0",
-            fullWithdrawFee: "1.0",
-            systemOperatorFee: "0.3",
-            salesFee: "2.0",
-            platformOperatorFee: "0.2",
-
-            // 판매/사용 정보
-            channelLimits: {
-              abc: { saleLimit: "50,000", discountLimit: "20,000" },
-              kb: { saleLimit: "30,000", discountLimit: "10,000" },
-              shinhan: { saleLimit: "", discountLimit: "" },
-              nh: { saleLimit: "", discountLimit: "" },
-              kakao: { saleLimit: "", discountLimit: "" },
-            },
-            merchantCategory: "all",
-            merchantPostCode: "all",
-            merchantSale: "none",
-            merchantCorporation: "none",
-          }}
-          onClose={handleCloseEdit}
-        />
+        <VoucherFormPanel mode="edit" initialValues={toFormValues(editingVoucher)} onClose={handleCloseEdit} />
       )}
     </div>
   );

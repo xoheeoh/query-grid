@@ -1,15 +1,15 @@
-import { Fragment, forwardRef, useImperativeHandle, useState, type ChangeEvent, type ReactNode } from "react";
-import { Banner, Button, Checkbox, CheckboxGroup, Icon, TextInput, Select, TabPanel, Tooltip } from "@xoheeoh/components";
-import { mdiHelpCircleOutline, mdiStorefrontCheckOutline, mdiStoreMarkerOutline } from "@mdi/js";
+import { forwardRef, useImperativeHandle, useState, type ChangeEvent, type ReactNode } from "react";
+import { Banner, Button, Checkbox, Icon, TextInput, Select, TabPanel } from "@xoheeoh/components";
+import { mdiStorefrontCheckOutline, mdiStoreMarkerOutline } from "@mdi/js";
 import { formatThousandInput } from "@utils";
 import { FormField } from "../FormField";
 import { SELLER_OPTIONS, type Option } from "../voucherOptions";
-import type { RegisterPanelHandle } from "./types";
+import type { FormPanelHandle } from "./types";
 import styles from "../VoucherManagePanel.module.css";
 
 /** 판매처 지정 관련 */
 type SaleChannelId = string;
-type ChannelLimits = Record<SaleChannelId, { saleLimit: string; discountLimit: string }>;
+export type ChannelLimits = Record<SaleChannelId, { saleLimit: string; discountLimit: string }>;
 
 const EMPTY_LIMITS: ChannelLimits = Object.fromEntries(
   SELLER_OPTIONS.map((seller) => [seller.value, { saleLimit: "", discountLimit: "" }]),
@@ -25,58 +25,27 @@ const POST_CODE_OPTIONS: Option[] = [
   { value: "all", label: "전체 지역" },
   { value: "target", label: "지정 우편번호" },
 ];
-const SALES_OPTIONS: Option[] = [
-  { value: "none", label: "매출 제한 없음" },
-  { value: "except", label: "특정 매출구간 가맹점만 불가" },
-  { value: "use", label: "지정 카테고리 가능 매출 설정" },
-];
-const CORPORATION_OPTIONS: Option[] = [
-  { value: "none", label: "법인 제한 없음" },
-  { value: "except", label: "지정 법인 제외" },
-];
-const SALES_CODE_OPTIONS: Option[] = ["A", "B", "C", "D", "E", "F", "G", "H"].map((code) => ({ value: code, label: code }));
-
-const SALES_RANGE_ROWS = [
-  [
-    { code: "Z", range: "0원" },
-    { code: "E", range: "30억 초과 ~ 50억 이하" },
-  ],
-  [
-    { code: "A", range: "1원 초과 ~ 8억 이하" },
-    { code: "F", range: "50억 초과 ~ 80억 이하" },
-  ],
-  [
-    { code: "B", range: "8억 초과 ~ 10억 이하" },
-    { code: "G", range: "80억 초과 ~ 120억 이하" },
-  ],
-  [
-    { code: "C", range: "10억 초과 ~ 12억 이하" },
-    { code: "H", range: "120억 초과" },
-  ],
-  [{ code: "D", range: "12억 초과 ~ 30억 이하" }],
-] as const;
 
 /** "추가"로 늘어나는 입력 줄 하나 */
-type RuleRow = { id: number; value: string; codes: string[] };
+type RuleRow = { id: number; value: string };
 /** 가맹점 조건 한 항목: 방식(드롭다운) + 추가한 줄들 */
 type RuleState = { mode: string; rows: RuleRow[] };
 
-type SaleForm = {
+/** 판매/사용 정보 탭의 입력값. 수정 화면은 이 모양으로 기존 값을 넘긴다. */
+export type VoucherSaleValues = {
   selectedChannels: SaleChannelId[];
   limits: ChannelLimits;
   category: RuleState;
   postCode: RuleState;
-  sale: RuleState;
-  corporation: RuleState;
 };
+
+type SaleForm = VoucherSaleValues;
 
 const INITIAL_FORM: SaleForm = {
   selectedChannels: [],
   limits: EMPTY_LIMITS,
   category: { mode: "all", rows: [] },
   postCode: { mode: "all", rows: [] },
-  sale: { mode: "none", rows: [] },
-  corporation: { mode: "none", rows: [] },
 };
 
 let ruleRowSeq = 0;
@@ -92,16 +61,14 @@ type MerchantRuleSectionProps = {
   rule: RuleState;
   onChange: (rule: RuleState) => void;
   placeholder: string;
-  /** 매출 조건은 줄마다 매출구간 코드도 고른다. */
-  withSalesCodes?: boolean;
 };
 
 /** 사용 가맹점 조건 한 항목. "추가"를 누를 때마다 입력 줄이 늘고, 줄마다 "삭제"가 있다. */
-function MerchantRuleSection({ label, name, options, noneValue, rule, onChange, placeholder, withSalesCodes }: MerchantRuleSectionProps) {
+function MerchantRuleSection({ label, name, options, noneValue, rule, onChange, placeholder }: MerchantRuleSectionProps) {
   const disabled = rule.mode === noneValue;
 
   const addRow = () => {
-    onChange({ ...rule, rows: [...rule.rows, { id: ++ruleRowSeq, value: "", codes: [] }] });
+    onChange({ ...rule, rows: [...rule.rows, { id: ++ruleRowSeq, value: "" }] });
   };
 
   const updateRow = (id: number, patch: Partial<RuleRow>) => {
@@ -139,16 +106,6 @@ function MerchantRuleSection({ label, name, options, noneValue, rule, onChange, 
                     onChange={(event) => updateRow(row.id, { value: event.target.value })}
                   />
                 </div>
-                {withSalesCodes && (
-                  <CheckboxGroup
-                    aria-label={`${name} ${index + 1} 매출구간 코드`}
-                    direction="horizontal"
-                    style={{ paddingRight: 12 }}
-                    options={SALES_CODE_OPTIONS}
-                    value={row.codes}
-                    onChange={(codes) => updateRow(row.id, { codes })}
-                  />
-                )}
               </div>
               <Button variant="outlined" color="destructive" onClick={() => removeRow(row.id)} label="삭제" />
             </div>
@@ -159,8 +116,22 @@ function MerchantRuleSection({ label, name, options, noneValue, rule, onChange, 
   );
 }
 
-export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoPannel(_, ref) {
-  const [form, setForm] = useState<SaleForm>(INITIAL_FORM);
+type SaleInfoPanelProps = {
+  /** 수정 화면에서 넘기는 기존 값. 없으면 빈 폼으로 시작한다. */
+  initialValues?: Partial<VoucherSaleValues>;
+};
+
+export const SaleInfoPanel = forwardRef<FormPanelHandle, SaleInfoPanelProps>(function SaleInfoPanel(
+  { initialValues },
+  ref,
+) {
+  // "처음 상태"는 처음 열릴 때 한 번만 정한다. 판매처별 한도는 빠진 판매처를 빈 값으로 채운다.
+  const [initial] = useState<SaleForm>(() => ({
+    ...INITIAL_FORM,
+    ...initialValues,
+    limits: { ...EMPTY_LIMITS, ...initialValues?.limits },
+  }));
+  const [form, setForm] = useState<SaleForm>(initial);
 
   const update = <K extends keyof SaleForm>(key: K, value: SaleForm[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -169,12 +140,12 @@ export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoP
   useImperativeHandle(
     ref,
     () => ({
-      reset: () => setForm(INITIAL_FORM),
+      reset: () => setForm(initial),
       // 판매/사용 정보에는 필수값이 없다.
       validate: () => true,
-      isDirty: () => JSON.stringify(form) !== JSON.stringify(INITIAL_FORM),
+      isDirty: () => JSON.stringify(form) !== JSON.stringify(initial),
     }),
-    [form],
+    [form, initial],
   );
 
   /** 판매처 지정 관련 */
@@ -304,64 +275,10 @@ export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoP
             onChange={(rule) => update("postCode", rule)}
             placeholder="우편번호를 입력해 주세요."
           />
-
-          <MerchantRuleSection
-            label={
-              <span className="row-center gap-4">
-                매출
-                <Tooltip
-                  position="bottom"
-                  arrow="vertical"
-                  content={
-                    <table className={styles.salesRangeTable}>
-                      <thead>
-                        <tr>
-                          <th>코드</th>
-                          <th>매출액 범위</th>
-                          <th>코드</th>
-                          <th>매출액 범위</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {SALES_RANGE_ROWS.map((row) => (
-                          <tr key={row.map((cell) => cell.code).join("-")}>
-                            {row.map((cell) => (
-                              <Fragment key={cell.code}>
-                                <td>{cell.code}</td>
-                                <td>{cell.range}</td>
-                              </Fragment>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  }>
-                  <Icon path={mdiHelpCircleOutline} size={16} />
-                </Tooltip>
-              </span>
-            }
-            name="매출 업종코드"
-            options={SALES_OPTIONS}
-            noneValue="none"
-            rule={form.sale}
-            onChange={(rule) => update("sale", rule)}
-            placeholder="업종코드를 입력해 주세요."
-            withSalesCodes
-          />
-
-          <MerchantRuleSection
-            label="법인"
-            name="법인번호"
-            options={CORPORATION_OPTIONS}
-            noneValue="none"
-            rule={form.corporation}
-            onChange={(rule) => update("corporation", rule)}
-            placeholder="법인번호를 입력해 주세요."
-          />
         </div>
       </div>
     </TabPanel>
   );
 });
 
-export default SaleInfoPannel;
+export default SaleInfoPanel;
