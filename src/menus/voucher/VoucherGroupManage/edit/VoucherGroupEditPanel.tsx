@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Alert,
   Button,
+  Checkbox,
   IconButton,
   Icon,
   TextInput,
@@ -145,25 +146,22 @@ export default function VoucherGroupEditPanel({ onClose, initialData }: VoucherG
 
                 <div className={styles.voucherList}>
                   {VOUCHER_OPTIONS.map((voucher) => {
-                    const inputId = `voucher-select-${voucher.id}`;
                     const isSelected = selectedVoucherIds.includes(voucher.id);
 
                     return (
-                      <label key={voucher.id} className={styles.voucherItem} htmlFor={inputId}>
-                        <div className="row-start gap-12">
-                          <input
-                            id={inputId}
-                            type="checkbox"
-                            className={styles.voucherCheckbox}
-                            checked={isSelected}
-                            onChange={(event) => handleVoucherToggle(voucher.id, event.target.checked)}
-                          />
-                          <div className="flex-col gap-4">
-                            <span className="text-subtitle3">{voucher.name}</span>
-                            <span className="text-color-secondary">{voucher.region}</span>
-                          </div>
-                        </div>
-                      </label>
+                      <div key={voucher.id} className={`${styles.voucherItem} ${isSelected ? styles.voucherItemSelected : ""}`}>
+                        <Checkbox
+                          className={styles.voucherCheckbox}
+                          checked={isSelected}
+                          onChange={(event) => handleVoucherToggle(voucher.id, event.target.checked)}
+                          label={
+                            <span className="flex-col gap-4">
+                              <span className="text-subtitle3">{voucher.name}</span>
+                              <span className="text-caption1 text-color-secondary">{voucher.region}</span>
+                            </span>
+                          }
+                        />
+                      </div>
                     );
                   })}
                 </div>
