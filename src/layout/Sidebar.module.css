@@ -65,8 +65,9 @@
   transition: transform 0.15s ease;
 }
 
-.groupButton[aria-expanded="false"] .chevron {
-  transform: rotate(-90deg);
+/* 닫힘: 아래 화살표(기본), 열림: 위 화살표 */
+.groupButton[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
 }
 
 .panel[data-open="false"] {
