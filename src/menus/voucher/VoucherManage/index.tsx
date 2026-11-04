@@ -9,19 +9,16 @@ import { COL } from "@utils";
 import { Button, Checkbox, CheckboxGroup, TextInput, Select } from "@xoheeoh/components";
 import VoucherRegisterPanel from "./register/VoucherRegisterPanel";
 import VoucherEditPanel from "./edit/VoucherEditPanel";
-
-const PUBLISHER_OPTIONS = [{ label: "전체", value: "all" }];
-const SELLER_OPTIONS = [{ label: "전체", value: "all" }];
-const STATUS_OPTIONS = ["1", "2", "3", "4"] as const;
-
-const STATUS_LABEL: Record<(typeof STATUS_OPTIONS)[number], string> = {
-  "1": "개인구매가능",
-  "2": "대량구매가능",
-  "3": "개인구매중지",
-  "4": "대량구매중지",
-};
-
-type StatusCode = (typeof STATUS_OPTIONS)[number];
+import {
+  PUBLISHER_OPTIONS,
+  SELLER_OPTIONS,
+  STATUS_CODES,
+  STATUS_LABEL,
+  STATUS_OPTIONS,
+  optionLabel,
+  withAllOption,
+  type StatusCode,
+} from "./voucherOptions";
 
 type VoucherRow = {
   id: number;
@@ -35,52 +32,50 @@ type VoucherRow = {
   totalDiscount: number;
 };
 
+/** 연 발행한도와 지금까지 쓴 비율로 나머지 금액을 계산해 한 줄을 만든다. */
+function makeRow(
+  id: number,
+  publisher: string,
+  seller: string,
+  voucherName: string,
+  status: StatusCode[],
+  annualIssuanceLimit: number,
+  usedRatio: number,
+): VoucherRow {
+  const annualDiscountLimit = annualIssuanceLimit / 10;
+  return {
+    id,
+    publisher,
+    seller,
+    voucherName,
+    status,
+    annualIssuanceLimit,
+    totalIssuance: Math.round(annualIssuanceLimit * usedRatio),
+    annualDiscountLimit,
+    totalDiscount: Math.round(annualDiscountLimit * usedRatio),
+  };
+}
+
 /** API 연동 전 샘플 데이터 */
 const MOCK_ROWS: VoucherRow[] = [
-  {
-    id: 1,
-    publisher: "중소벤처기업부",
-    seller: "가나다은행",
-    voucherName: "온누리상품권",
-    status: ["1", "4"],
-    annualIssuanceLimit: 120000000000,
-    totalIssuance: 120000000000,
-    annualDiscountLimit: 120000000000,
-    totalDiscount: 120000000000,
-  },
-  {
-    id: 2,
-    publisher: "중소벤처기업부",
-    seller: "가나다은행",
-    voucherName: "온누리상품권",
-    status: ["1", "2"],
-    annualIssuanceLimit: 120000000000,
-    totalIssuance: 120000000000,
-    annualDiscountLimit: 120000000000,
-    totalDiscount: 120000000000,
-  },
-  {
-    id: 3,
-    publisher: "서울특별시",
-    seller: "가나다은행",
-    voucherName: "서울사랑상품권",
-    status: ["2", "3"],
-    annualIssuanceLimit: 120000000000,
-    totalIssuance: 120000000000,
-    annualDiscountLimit: 120000000000,
-    totalDiscount: 120000000000,
-  },
-  {
-    id: 4,
-    publisher: "김포시",
-    seller: "가나다은행",
-    voucherName: "김포사랑상품권",
-    status: ["1"],
-    annualIssuanceLimit: 120000000000,
-    totalIssuance: 120000000000,
-    annualDiscountLimit: 120000000000,
-    totalDiscount: 120000000000,
-  },
+  makeRow(1, "중소벤처기업부", "가나다은행", "온누리상품권", ["1", "2"], 120_000_000_000, 0.71),
+  makeRow(2, "중소벤처기업부", "라마바은행", "온누리상품권 (카드형)", ["1", "4"], 80_000_000_000, 0.42),
+  makeRow(3, "서울특별시", "가나다은행", "서울사랑상품권", ["1", "2"], 50_000_000_000, 0.88),
+  makeRow(4, "서울특별시", "사아자페이", "서울사랑상품권 (청년)", ["2", "3"], 12_000_000_000, 0.35),
+  makeRow(5, "김포시", "가나다은행", "김포사랑상품권", ["1"], 9_000_000_000, 0.57),
+  makeRow(6, "경기도", "라마바은행", "경기사랑상품권", ["1", "2"], 70_000_000_000, 0.63),
+  makeRow(7, "경기도", "플랫폼 운영기관", "경기청년희망바우처", ["2", "3"], 6_500_000_000, 0.12),
+  makeRow(8, "부산광역시", "가나다은행", "부산사랑상품권", ["1", "2"], 45_000_000_000, 0.79),
+  makeRow(9, "부산광역시", "사아자페이", "부산전통시장상품권", ["3", "4"], 8_000_000_000, 1.0),
+  makeRow(10, "전라남도", "라마바은행", "전남사랑상품권", ["1", "2"], 30_000_000_000, 0.48),
+  makeRow(11, "전라남도", "가나다은행", "전남농어민바우처", ["1"], 4_200_000_000, 0.26),
+  makeRow(12, "중소벤처기업부", "플랫폼 운영기관", "전통시장 소비쿠폰", ["2"], 15_000_000_000, 0.93),
+  makeRow(13, "서울특별시", "라마바은행", "서울문화바우처", ["1", "4"], 3_000_000_000, 0.18),
+  makeRow(14, "김포시", "사아자페이", "김포육아바우처", ["3"], 2_400_000_000, 0.66),
+  makeRow(15, "경기도", "가나다은행", "경기농산물상품권", ["1", "2"], 11_000_000_000, 0.52),
+  makeRow(16, "부산광역시", "라마바은행", "부산관광바우처", ["2", "3"], 5_600_000_000, 0.07),
+  makeRow(17, "전라남도", "플랫폼 운영기관", "전남섬여행바우처", ["1"], 1_800_000_000, 0.39),
+  makeRow(18, "중소벤처기업부", "사아자페이", "온누리상품권 (모바일)", ["3", "4"], 60_000_000_000, 1.0),
 ];
 
 function isSuccessStatus(status: string) {
@@ -111,25 +106,31 @@ function ManageRenderer(params: ICellRendererParams<VoucherRow>) {
   return (
     <span className="grid-cell-center">
       <Button
- size="sm"
- variant="outlined" color="neutral"
- onClick={() => {
- if (params.data) onEdit?.(params.data);
- }} label="수정" />
+        size="sm"
+        variant="outlined"
+        color="neutral"
+        onClick={() => {
+          if (params.data) onEdit?.(params.data);
+        }}
+        label="수정"
+      />
     </span>
   );
 }
 
+const PUBLISHER_FILTER_OPTIONS = withAllOption(PUBLISHER_OPTIONS);
+const SELLER_FILTER_OPTIONS = withAllOption(SELLER_OPTIONS);
+
 export default function VoucherManage() {
   const [publisher, setPublisher] = useState<string>("all");
   const [seller, setSeller] = useState<string>("all");
-  const [status, setStatus] = useState<string[]>([...STATUS_OPTIONS]);
+  const [status, setStatus] = useState<string[]>([...STATUS_CODES]);
   const [search, setSearch] = useState<string>("");
   const [rowData, setRowData] = useState<VoucherRow[]>([]);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState<VoucherRow | null>(null);
 
-  const allStatusSelected = STATUS_OPTIONS.every((v) => status.includes(v));
+  const allStatusSelected = STATUS_CODES.every((v) => status.includes(v));
   const someStatusSelected = status.length > 0 && !allStatusSelected;
 
   const handleEdit = (row: VoucherRow) => {
@@ -147,21 +148,23 @@ export default function VoucherManage() {
   const columnDefs = useMemo<ColDef<VoucherRow>[]>(
     () => [
       COL.no<VoucherRow>(),
-      COL.text<VoucherRow>("발행처", "publisher", { width: 120 }),
-      COL.text<VoucherRow>("판매처", "seller", { width: 120 }),
-      COL.text<VoucherRow>("상품권명", "voucherName", { flex: 1, minWidth: 160 }),
-      COL.badges<VoucherRow>("상태", "status", { width: 220, cellRenderer: StatusBadgeRenderer }),
+      COL.text<VoucherRow>("발행처", "publisher", { width: 130 }),
+      COL.text<VoucherRow>("판매처", "seller", { width: 130 }),
+      COL.text<VoucherRow>("상품권명", "voucherName", { flex: 1, minWidth: 180 }),
+      COL.badges<VoucherRow>("상태", "status", { width: 200, cellRenderer: StatusBadgeRenderer }),
       COL.amount<VoucherRow>("연 발행한도", "annualIssuanceLimit", { width: 150 }),
       COL.amount<VoucherRow>("누적 발행금액", "totalIssuance", { width: 150 }),
-      COL.amount<VoucherRow>("연 할인한도", "annualDiscountLimit", { width: 150 }),
-      COL.amount<VoucherRow>("누적 할인금액", "totalDiscount", { width: 160 }),
+      COL.amount<VoucherRow>("연 할인한도", "annualDiscountLimit", { width: 140 }),
+      COL.amount<VoucherRow>("누적 할인금액", "totalDiscount", { width: 140 }),
+      // 표가 가로로 넘쳐도 "수정" 버튼은 항상 보이도록 오른쪽에 고정한다.
       COL.action<VoucherRow>("관리", undefined, {
         colId: "manage",
-        width: 100,
+        width: 90,
+        pinned: "right",
         cellRenderer: ManageRenderer,
       }),
     ],
-    []
+    [],
   );
 
   const defaultColDef = useMemo<ColDef>(() => ({ sortable: true, resizable: true }), []);
@@ -169,15 +172,19 @@ export default function VoucherManage() {
   const handleReset = () => {
     setPublisher("all");
     setSeller("all");
-    setStatus([...STATUS_OPTIONS]);
+    setStatus([...STATUS_CODES]);
     setSearch("");
     setRowData([]);
   };
 
   const handleSearch = () => {
     const keyword = search.trim();
+    const publisherName = publisher === "all" ? null : optionLabel(PUBLISHER_OPTIONS, publisher);
+    const sellerName = seller === "all" ? null : optionLabel(SELLER_OPTIONS, seller);
     const filtered = MOCK_ROWS.filter((row) => {
-      if (status.length > 0 && !row.status.some((s) => status.includes(s))) return false;
+      if (publisherName && row.publisher !== publisherName) return false;
+      if (sellerName && row.seller !== sellerName) return false;
+      if (!row.status.some((s) => status.includes(s))) return false;
       if (!keyword) return true;
       return row.seller.includes(keyword) || row.voucherName.includes(keyword);
     });
@@ -214,7 +221,8 @@ export default function VoucherManage() {
           <div className="table-item">
             <span className="text-body2 table-item-label">발행처</span>
             <Select
-              options={PUBLISHER_OPTIONS}
+              aria-label="발행처"
+              options={PUBLISHER_FILTER_OPTIONS}
               value={publisher}
               onValueChange={(value) => setPublisher(value)}
               className="table-item-value"
@@ -224,14 +232,16 @@ export default function VoucherManage() {
           <div className="table-item">
             <span className="text-body2 table-item-label">판매처</span>
             <Select
-              options={SELLER_OPTIONS}
+              aria-label="판매처"
+              options={SELLER_FILTER_OPTIONS}
               value={seller}
               onValueChange={(value) => setSeller(value)}
               className="table-item-value"
             />
           </div>
 
-          <div className="table-item">
+          {/* 선택지가 5개라 반 칸에는 안 들어가서 한 줄을 통으로 쓴다. */}
+          <div className="table-item grid-col-full">
             <span className="text-body2 table-item-label">상태</span>
             <div className="row-start gap-12">
               <Checkbox
@@ -239,15 +249,23 @@ export default function VoucherManage() {
                 labelStyle={{ whiteSpace: "nowrap" }}
                 checked={allStatusSelected}
                 indeterminate={someStatusSelected}
-                onChange={(e) => setStatus(e.target.checked ? [...STATUS_OPTIONS] : [])}
+                onChange={(e) => setStatus(e.target.checked ? [...STATUS_CODES] : [])}
               />
-              <CheckboxGroup name="status" value={status} onChange={setStatus} direction="horizontal" options={[{ value: "1", label: "개인구매 가능" }, { value: "2", label: "대량구매 가능" }, { value: "3", label: "개인구매 중지" }, { value: "4", label: "대량구매 중지" }]} />
+              <CheckboxGroup
+                aria-label="상태"
+                name="status"
+                value={status}
+                onChange={setStatus}
+                direction="horizontal"
+                options={STATUS_OPTIONS}
+              />
             </div>
           </div>
 
           <div className="table-item">
             <span className="text-body2 table-item-label">검색어</span>
             <TextInput
+              aria-label="검색어"
               type="search"
               placeholder="판매처명, 상품권명을 입력해 주세요."
               className="table-item-value"
@@ -308,8 +326,8 @@ export default function VoucherManage() {
             voucherDescription: `${editingVoucher.voucherName} 전자상품권입니다.`,
             usageDescription: "전통시장 및 지정 가맹점에서 사용 가능합니다.",
             validityType: "1",
-            validityPeriod: "1",
-            pinValidityPeriod: "1",
+            validityPeriod: "5",
+            pinValidityPeriod: "7",
             contactPhone: "15881234",
 
             // 기본 정책

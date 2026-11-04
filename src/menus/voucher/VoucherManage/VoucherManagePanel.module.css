@@ -33,6 +33,47 @@
   color: var(--color-red-500);
 }
 
+/* 라벨 + 입력칸 한 줄 (FormField) */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fieldBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--color-red-500);
+}
+
+/* 이미지 업로드 칸. 틀(label) 안에 숨긴 파일 입력이 있어서 클릭·키보드 모두로 열 수 있다. */
+.imageWrap {
+  position: relative;
+  width: 120px;
+}
+
+.imageInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.imageBox:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 .imageBox {
   position: relative;
   width: 120px;
@@ -53,6 +94,11 @@
 .imageBoxFilled {
   padding: 0;
   cursor: default;
+}
+
+/* .imageBox의 테두리 규칙보다 뒤에 있어야 빨간 테두리가 이긴다. */
+.imageBoxError {
+  border-color: var(--color-red-500);
 }
 
 .imagePreview {

@@ -29,6 +29,7 @@ type VoucherEditPanelProps = {
 export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPanelProps) {
   useSubviewLock();
   const toast = useToast();
+  const panelRef = useRef<HTMLDivElement>(null);
   // 값이 있으면 실패 알림을 띄운다. 닫으면 null로 돌아간다.
   const [failAlert, setFailAlert] = useState<{ title: string; message: string } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("basic");
@@ -75,7 +76,14 @@ export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPa
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape") return;
+      const target = event.target as HTMLElement | null;
+      // 알림창·모달 안에서 누른 Esc는 그쪽이 처리한다. 수정 화면까지 같이 닫히면 안 된다.
+      const nearestDialog = target?.closest('[role="dialog"], [role="alertdialog"]');
+      if (nearestDialog !== panelRef.current) return;
+      // 열려 있는 드롭다운은 자기가 닫는다.
+      if (target?.closest('[aria-expanded="true"]')) return;
+      onClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -83,6 +91,7 @@ export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPa
 
   return (
     <div
+      ref={panelRef}
       className="page-subview"
       role="dialog"
       aria-modal="true"
@@ -123,7 +132,7 @@ export default function VoucherEditPanel({ onClose, initialData }: VoucherEditPa
         <Button variant="outlined" color="neutral" onClick={handleReset} label="초기화" />
         <div className="row-center gap-8">
           <Button variant="outlined" color="neutral" onClick={onClose} label="취소" />
-          <Button color="neutral" onClick={() => {}} label="적립 개시" />
+          <Button variant="outlined" color="neutral" onClick={() => {}} label="적립 개시" />
           <Button color="destructive" onClick={() => setIsDeleteModalOpen(true)} label="삭제" />
           <Button onClick={() => setIsConfirmModalOpen(true)} label="수정" />
         </div>

@@ -1,50 +1,40 @@
-import { ChangeEvent, Fragment, forwardRef, useImperativeHandle, useState } from "react";
+import { Fragment, forwardRef, useImperativeHandle, useState, type ChangeEvent, type ReactNode } from "react";
 import { Banner, Button, Checkbox, CheckboxGroup, Icon, TextInput, Select, TabPanel, Tooltip } from "@xoheeoh/components";
 import { mdiHelpCircleOutline, mdiStorefrontCheckOutline, mdiStoreMarkerOutline } from "@mdi/js";
 import { formatThousandInput } from "@utils";
+import { FormField } from "../FormField";
+import { SELLER_OPTIONS, type Option } from "../voucherOptions";
 import type { RegisterPanelHandle } from "./types";
 import styles from "../VoucherManagePanel.module.css";
 
 /** 판매처 지정 관련 */
-const SALE_CHANNELS = [
-  { id: "kb", name: "국민은행" },
-  { id: "shinhan", name: "신한은행" },
-  { id: "nh", name: "농협은행" },
-  { id: "kakao", name: "카카오뱅크" },
-] as const;
-
-const EMPTY_LIMITS = Object.fromEntries(
-  SALE_CHANNELS.map((ch) => [ch.id, { saleLimit: "", discountLimit: "" }])
-) as ChannelLimits;
-
-type SaleChannelId = (typeof SALE_CHANNELS)[number]["id"];
+type SaleChannelId = string;
 type ChannelLimits = Record<SaleChannelId, { saleLimit: string; discountLimit: string }>;
 
+const EMPTY_LIMITS: ChannelLimits = Object.fromEntries(
+  SELLER_OPTIONS.map((seller) => [seller.value, { saleLimit: "", discountLimit: "" }]),
+);
+
 /** 사용 가맹점 관련 */
-const CATEGORIES = [
-  { id: "all", name: "전체 가맹점" },
-  { id: "except", name: "특정 카테고리 제외" },
-  { id: "use", name: "특정 카테고리 사용" },
+const CATEGORY_OPTIONS: Option[] = [
+  { value: "all", label: "전체 가맹점" },
+  { value: "except", label: "특정 카테고리 제외" },
+  { value: "use", label: "특정 카테고리 사용" },
 ];
-const POST_CODES = [
-  { id: "all", name: "전체 지역" },
-  { id: "target", name: "지정 우편번호" },
+const POST_CODE_OPTIONS: Option[] = [
+  { value: "all", label: "전체 지역" },
+  { value: "target", label: "지정 우편번호" },
 ];
-const SALES = [
-  { id: "none", name: "매출 제한 없음" },
-  {
-    id: "except",
-    name: "특정 매출구간 가맹점만 불가",
-  },
-  { id: "use", name: "지정 카테고리 가능 매출 설정" },
+const SALES_OPTIONS: Option[] = [
+  { value: "none", label: "매출 제한 없음" },
+  { value: "except", label: "특정 매출구간 가맹점만 불가" },
+  { value: "use", label: "지정 카테고리 가능 매출 설정" },
 ];
-const CORPORATIONS = [
-  { id: "none", name: "법인 제한 없음" },
-  {
-    id: "except",
-    name: "지정 법인 제외",
-  },
+const CORPORATION_OPTIONS: Option[] = [
+  { value: "none", label: "법인 제한 없음" },
+  { value: "except", label: "지정 법인 제외" },
 ];
+const SALES_CODE_OPTIONS: Option[] = ["A", "B", "C", "D", "E", "F", "G", "H"].map((code) => ({ value: code, label: code }));
 
 const SALES_RANGE_ROWS = [
   [
@@ -66,53 +56,147 @@ const SALES_RANGE_ROWS = [
   [{ code: "D", range: "12억 초과 ~ 30억 이하" }],
 ] as const;
 
-export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoPannel(_, ref) {
-  /** 판매처 지정 관련 */
-  const [selectedChannels, setSelectedChannels] = useState<SaleChannelId[]>([]);
-  const [limits, setLimits] = useState<ChannelLimits>(EMPTY_LIMITS);
+/** "추가"로 늘어나는 입력 줄 하나 */
+type RuleRow = { id: number; value: string; codes: string[] };
+/** 가맹점 조건 한 항목: 방식(드롭다운) + 추가한 줄들 */
+type RuleState = { mode: string; rows: RuleRow[] };
 
-  const allSelected = SALE_CHANNELS.every((ch) => selectedChannels.includes(ch.id));
-  const someSelected = selectedChannels.length > 0 && !allSelected;
+type SaleForm = {
+  selectedChannels: SaleChannelId[];
+  limits: ChannelLimits;
+  category: RuleState;
+  postCode: RuleState;
+  sale: RuleState;
+  corporation: RuleState;
+};
+
+const INITIAL_FORM: SaleForm = {
+  selectedChannels: [],
+  limits: EMPTY_LIMITS,
+  category: { mode: "all", rows: [] },
+  postCode: { mode: "all", rows: [] },
+  sale: { mode: "none", rows: [] },
+  corporation: { mode: "none", rows: [] },
+};
+
+let ruleRowSeq = 0;
+
+type MerchantRuleSectionProps = {
+  /** 화면에 보이는 라벨. 도움말 아이콘 같은 걸 붙일 수 있다. */
+  label: ReactNode;
+  /** 화면 낭독기용 이름. "카테고리 1 삭제"처럼 쓰인다. */
+  name: string;
+  options: Option[];
+  /** 이 값이면 "제한 없음"이라 줄을 추가할 수 없다. */
+  noneValue: string;
+  rule: RuleState;
+  onChange: (rule: RuleState) => void;
+  placeholder: string;
+  /** 매출 조건은 줄마다 매출구간 코드도 고른다. */
+  withSalesCodes?: boolean;
+};
+
+/** 사용 가맹점 조건 한 항목. "추가"를 누를 때마다 입력 줄이 늘고, 줄마다 "삭제"가 있다. */
+function MerchantRuleSection({ label, name, options, noneValue, rule, onChange, placeholder, withSalesCodes }: MerchantRuleSectionProps) {
+  const disabled = rule.mode === noneValue;
+
+  const addRow = () => {
+    onChange({ ...rule, rows: [...rule.rows, { id: ++ruleRowSeq, value: "", codes: [] }] });
+  };
+
+  const updateRow = (id: number, patch: Partial<RuleRow>) => {
+    onChange({ ...rule, rows: rule.rows.map((row) => (row.id === id ? { ...row, ...patch } : row)) });
+  };
+
+  const removeRow = (id: number) => {
+    onChange({ ...rule, rows: rule.rows.filter((row) => row.id !== id) });
+  };
+
+  return (
+    <FormField label={label}>
+      {(control) => (
+        <div className={styles.tableItemInBox}>
+          <div className={styles.tableItem}>
+            <div className="table-item-value">
+              <Select
+                {...control}
+                options={options}
+                value={rule.mode}
+                onValueChange={(mode) => onChange({ mode, rows: mode === noneValue ? [] : rule.rows })}
+              />
+            </div>
+            <Button variant="outlined" disabled={disabled} onClick={addRow} label="추가" />
+          </div>
+
+          {rule.rows.map((row, index) => (
+            <div key={row.id} className={styles.tableItem}>
+              <div className="row-center gap-8 table-item-value">
+                <div className="table-item-value">
+                  <TextInput
+                    aria-label={`${name} ${index + 1}`}
+                    placeholder={placeholder}
+                    value={row.value}
+                    onChange={(event) => updateRow(row.id, { value: event.target.value })}
+                  />
+                </div>
+                {withSalesCodes && (
+                  <CheckboxGroup
+                    aria-label={`${name} ${index + 1} 매출구간 코드`}
+                    direction="horizontal"
+                    style={{ paddingRight: 12 }}
+                    options={SALES_CODE_OPTIONS}
+                    value={row.codes}
+                    onChange={(codes) => updateRow(row.id, { codes })}
+                  />
+                )}
+              </div>
+              <Button variant="outlined" color="destructive" onClick={() => removeRow(row.id)} label="삭제" />
+            </div>
+          ))}
+        </div>
+      )}
+    </FormField>
+  );
+}
+
+export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoPannel(_, ref) {
+  const [form, setForm] = useState<SaleForm>(INITIAL_FORM);
+
+  const update = <K extends keyof SaleForm>(key: K, value: SaleForm[K]) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      reset: () => setForm(INITIAL_FORM),
+      // 판매/사용 정보에는 필수값이 없다.
+      validate: () => true,
+      isDirty: () => JSON.stringify(form) !== JSON.stringify(INITIAL_FORM),
+    }),
+    [form],
+  );
+
+  /** 판매처 지정 관련 */
+  const allSelected = SELLER_OPTIONS.every((seller) => form.selectedChannels.includes(seller.value));
+  const someSelected = form.selectedChannels.length > 0 && !allSelected;
 
   const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedChannels(event.target.checked ? SALE_CHANNELS.map((ch) => ch.id) : []);
+    update("selectedChannels", event.target.checked ? SELLER_OPTIONS.map((seller) => seller.value) : []);
   };
 
   const handleSelectChannel = (id: SaleChannelId) => (event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedChannels((prev) => (event.target.checked ? [...prev, id] : prev.filter((v) => v !== id)));
+    update(
+      "selectedChannels",
+      event.target.checked ? [...form.selectedChannels, id] : form.selectedChannels.filter((v) => v !== id),
+    );
   };
 
   const handleLimitChange =
     (id: SaleChannelId, field: "saleLimit" | "discountLimit") => (event: ChangeEvent<HTMLInputElement>) => {
       const formatted = formatThousandInput(event.target.value);
-      setLimits((prev) => ({ ...prev, [id]: { ...prev[id], [field]: formatted } }));
+      update("limits", { ...form.limits, [id]: { ...form.limits[id], [field]: formatted } });
     };
-
-  /** 사용 가맹점 관련 */
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedPostCode, setSelectedPostCode] = useState<string>("all");
-  const [selectedSale, setSelectedSale] = useState<string>("none");
-  const [selectedCorporation, setSelectedCorporation] = useState<string>("none");
-
-  const [addCategoryVisible, setAddCategoryVisible] = useState(false);
-  const [addPostCodeVisible, setAddPostCodeVisible] = useState(false);
-  const [addSaleVisible, setAddSaleVisible] = useState(false);
-  const [addCorporationVisible, setAddCorporationVisible] = useState(false);
-
-  useImperativeHandle(ref, () => ({
-    reset: () => {
-      setSelectedChannels([]);
-      setLimits(EMPTY_LIMITS);
-      setSelectedCategory("all");
-      setSelectedPostCode("all");
-      setSelectedSale("none");
-      setSelectedCorporation("none");
-      setAddCategoryVisible(false);
-      setAddPostCodeVisible(false);
-      setAddSaleVisible(false);
-      setAddCorporationVisible(false);
-    },
-  }));
 
   return (
     <TabPanel value="sale" forceMount className="page-subview-body flex-col gap-16">
@@ -143,29 +227,30 @@ export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoP
             </thead>
 
             <tbody>
-              {SALE_CHANNELS.map((channel) => {
-                const checked = selectedChannels.includes(channel.id);
-                const channelLimits = limits[channel.id];
+              {SELLER_OPTIONS.map((seller) => {
+                const checked = form.selectedChannels.includes(seller.value);
+                const channelLimits = form.limits[seller.value];
                 return (
-                  <tr key={channel.id}>
+                  <tr key={seller.value}>
                     <td>
                       <Checkbox
-                        aria-label={`${channel.name} 선택`}
+                        aria-label={`${seller.label} 선택`}
                         checked={checked}
-                        onChange={handleSelectChannel(channel.id)}
+                        onChange={handleSelectChannel(seller.value)}
                       />
                     </td>
-                    <td>{channel.name}</td>
+                    <td>{seller.label}</td>
                     <td>
                       <div className={styles.inputBox}>
                         <TextInput
+                          aria-label={`${seller.label} 연 판매한도`}
                           placeholder="금액을 입력해 주세요."
                           className="table-item-value"
                           align="right"
                           inputMode="numeric"
                           disabled={!checked}
                           value={channelLimits.saleLimit}
-                          onChange={handleLimitChange(channel.id, "saleLimit")}
+                          onChange={handleLimitChange(seller.value, "saleLimit")}
                         />
                         <span className="text-body2">천원</span>
                       </div>
@@ -173,13 +258,14 @@ export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoP
                     <td>
                       <div className={styles.inputBox}>
                         <TextInput
+                          aria-label={`${seller.label} 연 할인판매한도`}
                           placeholder="금액을 입력해 주세요."
                           className="table-item-value"
                           align="right"
                           inputMode="numeric"
                           disabled={!checked}
                           value={channelLimits.discountLimit}
-                          onChange={handleLimitChange(channel.id, "discountLimit")}
+                          onChange={handleLimitChange(seller.value, "discountLimit")}
                         />
                         <span className="text-body2">천원</span>
                       </div>
@@ -199,176 +285,79 @@ export const SaleInfoPannel = forwardRef<RegisterPanelHandle>(function SaleInfoP
         </div>
 
         <div className={styles.content}>
-          <div className={styles.tableItem}>
-            <span className="text-body2 table-item-label">카테고리</span>
+          <MerchantRuleSection
+            label="카테고리"
+            name="카테고리 업종코드"
+            options={CATEGORY_OPTIONS}
+            noneValue="all"
+            rule={form.category}
+            onChange={(rule) => update("category", rule)}
+            placeholder="업종코드를 입력해 주세요."
+          />
 
-            <div className={styles.tableItemInBox}>
-              <div className={styles.tableItem}>
-                <div className="table-item-value">
-                  <Select
-                    options={CATEGORIES.map((c) => ({ value: c.id, label: c.name }))}
-                    value={selectedCategory}
-                    onValueChange={(value) => {
-                      setSelectedCategory(value);
-                      if (value === "all") setAddCategoryVisible(false);
-                    }}
-                  />
-                </div>
+          <MerchantRuleSection
+            label="우편번호"
+            name="우편번호"
+            options={POST_CODE_OPTIONS}
+            noneValue="all"
+            rule={form.postCode}
+            onChange={(rule) => update("postCode", rule)}
+            placeholder="우편번호를 입력해 주세요."
+          />
 
-                <Button
- variant="outlined"
- disabled={selectedCategory === "all"}
- onClick={() => setAddCategoryVisible(true)} label="추가" />
-              </div>
-
-              {addCategoryVisible && (
-                <div className={styles.tableItem}>
-                  <div className="table-item-value">
-                    <TextInput placeholder="업종코드를 입력해 주세요." />
-                  </div>
-
-                  <Button variant="outlined" color="destructive" onClick={() => setAddCategoryVisible(false)} label="삭제" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.tableItem}>
-            <span className="text-body2 table-item-label">우편번호</span>
-
-            <div className={styles.tableItemInBox}>
-              <div className={styles.tableItem}>
-                <div className="table-item-value">
-                  <Select
-                    options={POST_CODES.map((c) => ({ value: c.id, label: c.name }))}
-                    value={selectedPostCode}
-                    onValueChange={(value) => {
-                      setSelectedPostCode(value);
-                      if (value === "all") setAddPostCodeVisible(false);
-                    }}
-                  />
-                </div>
-
-                <Button
- variant="outlined"
- disabled={selectedPostCode === "all"}
- onClick={() => setAddPostCodeVisible(true)} label="추가" />
-              </div>
-
-              {addPostCodeVisible && (
-                <div className={styles.tableItem}>
-                  <div className="table-item-value">
-                    <TextInput placeholder="우편번호를 입력해 주세요." />
-                  </div>
-
-                  <Button variant="outlined" color="destructive" onClick={() => setAddPostCodeVisible(false)} label="삭제" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.tableItem}>
-            <span className="text-body2 table-item-label row-center gap-4">
-              매출
-              <Tooltip
-                position="bottom"
-                arrow="vertical"
-                content={
-                  <table className={styles.salesRangeTable}>
-                    <thead>
-                      <tr>
-                        <th>코드</th>
-                        <th>매출액 범위</th>
-                        <th>코드</th>
-                        <th>매출액 범위</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {SALES_RANGE_ROWS.map((row) => (
-                        <tr key={row.map((cell) => cell.code).join("-")}>
-                          {row.map((cell) => (
-                            <Fragment key={cell.code}>
-                              <td>{cell.code}</td>
-                              <td>{cell.range}</td>
-                            </Fragment>
-                          ))}
+          <MerchantRuleSection
+            label={
+              <span className="row-center gap-4">
+                매출
+                <Tooltip
+                  position="bottom"
+                  arrow="vertical"
+                  content={
+                    <table className={styles.salesRangeTable}>
+                      <thead>
+                        <tr>
+                          <th>코드</th>
+                          <th>매출액 범위</th>
+                          <th>코드</th>
+                          <th>매출액 범위</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                }>
-                <Icon path={mdiHelpCircleOutline} size={16} />
-              </Tooltip>
-            </span>
+                      </thead>
+                      <tbody>
+                        {SALES_RANGE_ROWS.map((row) => (
+                          <tr key={row.map((cell) => cell.code).join("-")}>
+                            {row.map((cell) => (
+                              <Fragment key={cell.code}>
+                                <td>{cell.code}</td>
+                                <td>{cell.range}</td>
+                              </Fragment>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  }>
+                  <Icon path={mdiHelpCircleOutline} size={16} />
+                </Tooltip>
+              </span>
+            }
+            name="매출 업종코드"
+            options={SALES_OPTIONS}
+            noneValue="none"
+            rule={form.sale}
+            onChange={(rule) => update("sale", rule)}
+            placeholder="업종코드를 입력해 주세요."
+            withSalesCodes
+          />
 
-            <div className={styles.tableItemInBox}>
-              <div className={styles.tableItem}>
-                <div className="table-item-value">
-                  <Select
-                    options={SALES.map((c) => ({ value: c.id, label: c.name }))}
-                    value={selectedSale}
-                    onValueChange={(value) => {
-                      setSelectedSale(value);
-                      if (value === "none") setAddSaleVisible(false);
-                    }}
-                  />
-                </div>
-
-                <Button
- variant="outlined"
- disabled={selectedSale === "none"}
- onClick={() => setAddSaleVisible(true)} label="추가" />
-              </div>
-
-              {addSaleVisible && (
-                <div className={styles.tableItem}>
-                  <div className="row-center gap-8 table-item-value">
-                    <div className="table-item-value">
-                      <TextInput placeholder="업종코드를 입력해 주세요." />
-                    </div>
-
-                    <CheckboxGroup direction="horizontal" style={{ paddingRight: 12 }} options={[{ value: "A", label: "A" }, { value: "B", label: "B" }, { value: "C", label: "C" }, { value: "D", label: "D" }, { value: "E", label: "E" }, { value: "F", label: "F" }, { value: "G", label: "G" }, { value: "H", label: "H" }]} />
-                  </div>
-
-                  <Button variant="outlined" color="destructive" onClick={() => setAddSaleVisible(false)} label="삭제" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.tableItem}>
-            <span className="text-body2 table-item-label">법인</span>
-
-            <div className={styles.tableItemInBox}>
-              <div className={styles.tableItem}>
-                <div className="table-item-value">
-                  <Select
-                    options={CORPORATIONS.map((c) => ({ value: c.id, label: c.name }))}
-                    value={selectedCorporation}
-                    onValueChange={(value) => {
-                      setSelectedCorporation(value);
-                      if (value === "none") setAddCorporationVisible(false);
-                    }}
-                  />
-                </div>
-
-                <Button
- variant="outlined"
- disabled={selectedCorporation === "none"}
- onClick={() => setAddCorporationVisible(true)} label="추가" />
-              </div>
-
-              {addCorporationVisible && (
-                <div className={styles.tableItem}>
-                  <div className="table-item-value">
-                    <TextInput placeholder="법인번호를 입력해 주세요." />
-                  </div>
-
-                  <Button variant="outlined" color="destructive" onClick={() => setAddCorporationVisible(false)} label="삭제" />
-                </div>
-              )}
-            </div>
-          </div>
+          <MerchantRuleSection
+            label="법인"
+            name="법인번호"
+            options={CORPORATION_OPTIONS}
+            noneValue="none"
+            rule={form.corporation}
+            onChange={(rule) => update("corporation", rule)}
+            placeholder="법인번호를 입력해 주세요."
+          />
         </div>
       </div>
     </TabPanel>

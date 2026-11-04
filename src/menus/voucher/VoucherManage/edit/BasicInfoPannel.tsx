@@ -1,7 +1,14 @@
 import { Fragment, forwardRef, useImperativeHandle, useState } from "react";
 import { EditPanelHandle, VoucherEditInitialData } from "./types";
 import { formatAmount } from "@utils";
-import { Button, CheckboxGroup, Icon, TextInput, RadioGroup, Select, TabPanel } from "@xoheeoh/components";
+import { Button, CheckboxGroup, Icon, TextInput, RadioGroup, Select, TabPanel, useToast } from "@xoheeoh/components";
+import { LIMIT_MODAL_PRESETS, LimitHistoryModal, type LimitModalKind } from "../register/modal";
+import {
+  APP_DISPLAY_TYPE_OPTIONS,
+  PIN_VALIDITY_OPTIONS,
+  VALIDITY_PERIOD_OPTIONS,
+  VALIDITY_TYPE_OPTIONS,
+} from "../voucherOptions";
 import {
   mdiCashSync,
   mdiClose,
@@ -38,6 +45,14 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
 
   // 기본 정책 변경 이력 조회
   const [isBasicPolicyChangeHistoryModalOpen, setIsBasicPolicyChangeHistoryModalOpen] = useState(false);
+
+  // 한도·기간 관리 모달. 어떤 항목인지 kind로 구분한다.
+  const [limitModal, setLimitModal] = useState<LimitModalKind | null>(null);
+  const toast = useToast();
+  const handleSaveLimit = (kind: LimitModalKind) => {
+    setLimitModal(null);
+    toast.success(`${LIMIT_MODAL_PRESETS[kind].title.replace(" 관리", "")} 정보가 저장되었습니다.`);
+  };
 
   return (
     <TabPanel value="basic" forceMount className="page-subview-body flex-col gap-16">
@@ -95,7 +110,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                 <div className="table-item-value row-center gap-8">
                   <Select
                     defaultValue={initialData.appDisplayType}
-                    options={[{ value: "1", label: "정책발행" }]}
+                    options={APP_DISPLAY_TYPE_OPTIONS}
                     style={{ width: 200, flexShrink: 0 }}
                   />
                   <TextInput
@@ -168,12 +183,12 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                 <div className="table-item-value row-center gap-8">
                   <Select
                     defaultValue={initialData.validityType}
-                    options={[{ value: "1", label: "구매일로부터" }]}
+                    options={VALIDITY_TYPE_OPTIONS}
                     style={{ flex: 1, flexShrink: 0 }}
                   />
                   <Select
                     defaultValue={initialData.validityPeriod}
-                    options={[{ value: "1", label: "5년" }]}
+                    options={VALIDITY_PERIOD_OPTIONS}
                     style={{ flex: 1, flexShrink: 0 }}
                   />
                 </div>
@@ -185,7 +200,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                 </span>
 
                 <div className="table-item-value">
-                  <Select defaultValue={initialData.pinValidityPeriod} options={[{ value: "1", label: "7일" }]} />
+                  <Select defaultValue={initialData.pinValidityPeriod} options={PIN_VALIDITY_OPTIONS} />
                 </div>
               </div>
 
@@ -213,6 +228,8 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
           </div>
         </div>
 
+        <LimitHistoryModal kind={limitModal} onClose={() => setLimitModal(null)} onSave={handleSaveLimit} />
+
         {/* 2. 기본 정책 */}
         <div className={styles.body}>
           <div className={`flex-between ${styles.title}`} style={{ padding: "0 16px", height: 57 }}>
@@ -236,7 +253,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     defaultValue={formatAmount(initialData.annualIssuanceLimit)}
                   />
                   <span className="text-body2">천원</span>
-                  <Button variant="outlined" onClick={() => {}} label="한도 관리" />
+                  <Button variant="outlined" onClick={() => setLimitModal("annualIssuance")} label="한도 관리" />
                 </div>
               </div>
 
@@ -276,7 +293,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     defaultValue={formatAmount(initialData.annualDiscountLimit)}
                   />
                   <span className="text-body2">천원</span>
-                  <Button variant="outlined" onClick={() => {}} label="한도 관리" />
+                  <Button variant="outlined" onClick={() => setLimitModal("annualDiscount")} label="한도 관리" />
                 </div>
               </div>
 
@@ -301,9 +318,8 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                   가능 여부
                 </span>
 
-                <div className="table-item-value flex-between gap-8">
+                <div className="table-item-value">
                   <RadioGroup direction="horizontal" defaultValue={initialData.personalPurchaseAvailable} options={[{ value: "off", label: "N" }, { value: "on", label: "Y" }]} />
-                  <Button variant="outlined" onClick={() => {}} label="구매 관리" />
                 </div>
               </div>
 
@@ -344,7 +360,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     className="table-item-value"
                   />
                   <span className="text-body2">천원</span>
-                  <Button variant="outlined" onClick={() => {}} label="한도 관리" />
+                  <Button variant="outlined" onClick={() => setLimitModal("monthlyDiscountPurchase")} label="한도 관리" />
                 </div>
               </div>
 
@@ -387,7 +403,7 @@ export const BasicInfoPannel = forwardRef<EditPanelHandle, BasicInfoPannelProps>
                     className="table-item-value"
                   />
                   <span className="text-body2">일</span>
-                  <Button variant="outlined" onClick={() => {}} label="기간 관리" />
+                  <Button variant="outlined" onClick={() => setLimitModal("purchaseCancelPeriod")} label="기간 관리" />
                 </div>
               </div>
 

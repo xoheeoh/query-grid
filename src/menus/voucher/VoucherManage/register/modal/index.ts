@@ -1,1 +1,1 @@
-export * from "./AnnualLimitModal";
+export * from "./LimitHistoryModal";
