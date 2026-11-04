@@ -77,11 +77,12 @@ function MainPageContent() {
     activateTab(menuId);
   }
 
-  function closeTab(tabId: TabId) {
-    const index = openTabs.indexOf(tabId);
-    if (index === -1) return;
+  /** 여러 탭을 한 번에 닫는다. 보고 있던 탭이 닫히면 원래 자리에서 가장 가까운 남은 탭(앞쪽 우선)을 연다. */
+  function closeTabs(tabIds: TabId[]) {
+    const closing = new Set(tabIds);
+    const next = openTabs.filter((id) => !closing.has(id));
+    if (next.length === openTabs.length) return;
 
-    const next = openTabs.filter((id) => id !== tabId);
     setOpenTabs(next);
 
     if (next.length === 0) {
@@ -89,9 +90,16 @@ function MainPageContent() {
       return;
     }
 
-    if (tabId === activeTab) {
-      setActiveTab(next[index - 1] ?? next[index]!);
+    if (activeTab !== null && closing.has(activeTab)) {
+      const index = openTabs.indexOf(activeTab);
+      const before = openTabs.slice(0, index).reverse().find((id) => !closing.has(id));
+      const after = openTabs.slice(index + 1).find((id) => !closing.has(id));
+      setActiveTab(before ?? after ?? next[0]!);
     }
+  }
+
+  function closeTab(tabId: TabId) {
+    closeTabs([tabId]);
   }
 
   /** ContentTabBar 탭 선택 — 서브뷰가 열려 있으면 이탈 확인 후 이동 */
@@ -189,7 +197,13 @@ function MainPageContent() {
         </Sidebar>
 
         <main className={styles.content}>
-          <ContentTabBar openTabs={openTabs} activeTab={activeTab} onSelect={handleSelectTab} onClose={closeTab} />
+          <ContentTabBar
+            openTabs={openTabs}
+            activeTab={activeTab}
+            onSelect={handleSelectTab}
+            onClose={closeTab}
+            onCloseMany={closeTabs}
+          />
           <div className={styles.contentBody}>
             <MenuContent tabId={activeTab} />
           </div>
