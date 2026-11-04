@@ -2,7 +2,8 @@ import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ColGroupDef, RowClassParams } from "ag-grid-community";
 import { COL, exportGridToExcel, toDateValue } from "@utils";
-import { Button, DateField, Dialog, TextButton } from "@xoheeoh/components";
+import { Button, DateField, Dialog, Icon, TextButton } from "@xoheeoh/components";
+import { mdiHelpCircleOutline } from "@mdi/js";
 
 type SendingStatsRow = {
   id: number;
@@ -183,11 +184,18 @@ export default function SendingStats() {
             <span className="text-caption1 text-color-danger">
               ⓘ 대량선물 건수에는 자동생성 건수가 포함되어있습니다.
             </span>
+            {/* 실행 버튼이 아니라 설명을 여는 도움말이라 글자 버튼으로 둔다. */}
+            <TextButton
+              size="sm"
+              color="neutral"
+              icon={<Icon path={mdiHelpCircleOutline} size={16} />}
+              onClick={() => setIsBasisModalOpen(true)}
+              label="집계 기준"
+            />
           </div>
 
           <div className="row-center gap-8">
             <span className="text-caption1 text-color-secondary">ⓘ 단가: 카카오 알림톡: 00.0원 / LMS: 00.0원</span>
-            <Button size="sm" variant="outlined" color="neutral" onClick={() => setIsBasisModalOpen(true)} label="집계 기준" />
             <Button
               size="sm"
               variant="outlined"
@@ -227,160 +235,75 @@ export default function SendingStats() {
         </AgGridProvider>
       </div>
 
-      {/* 집계 기준 테이블 모달 */}
+      {/* 집계 기준 안내 모달. 데모라 대표 항목 4개만 보여준다. */}
       <Dialog
         size="lg"
         open={isBasisModalOpen}
         onClose={() => setIsBasisModalOpen(false)}
-        title="집계 기준"
+        title="집계 기준 안내"
         footer={
           <Button variant="outlined" color="neutral" onClick={() => setIsBasisModalOpen(false)} label="확인" />
         }>
-        <div style={{ maxHeight: "70vh", overflowY: "auto" }}>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>구분</th>
-                <th>타입</th>
-                <th>집계 기준</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>개인선물</td>
-                <td
-                  rowSpan={9}
-                  style={{
-                    borderRight: "1px solid var(--color-border-default)",
-                    borderLeft: "1px solid var(--color-border-default)",
-                  }}>
-                  성공: 카카오 알림톡
-                  <br />
-                  실패: LMS
-                </td>
+        <table className="table">
+          <thead>
+            <tr>
+              <th style={{ width: 120 }}>구분</th>
+              <th style={{ width: 150 }}>발송 채널</th>
+              <th>집계 기준</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BASIS_ROWS.map((row, index) => (
+              <tr key={row.label}>
+                <td>{row.label}</td>
+                {index === 0 && (
+                  <td rowSpan={BASIS_ROWS.length} style={s.channelCell}>
+                    성공: 카카오 알림톡
+                    <br />
+                    실패: LMS
+                  </td>
+                )}
                 <td>
                   <ul style={s.list}>
-                    <li>발송일 기준 / 발송된 판매처에 부과</li>
+                    {row.rules.map((rule) => (
+                      <li key={rule}>{rule}</li>
+                    ))}
                   </ul>
                 </td>
               </tr>
-              <tr>
-                <td>대량선물</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>대량선물 & 자동생성 합산하여 집계</li>
-                    <li>
-                      대량선물은 상태값에 따라 집계
-                      <ul style={s.subList}>
-                        <li>- 등록대기: 집계에서 제외 (등록 또는 취소 후 집계 반영)</li>
-                        <li>- 등록: 등록일 기준 / 등록된 판매처에 부과</li>
-                        <li>- 관리자취소 or 만료취소: 취소 or 만료일 기준 / 플랫폼 운영기관에 부과</li>
-                      </ul>
-                    </li>
-                    <li>
-                      대량선물 재발송 건수도 재발송 후 상태값에 따라 집계
-                      <ul style={s.subList}>
-                        <li>- 등록대기: 집계에서 제외 (등록 또는 취소 후 집계 반영)</li>
-                        <li>- 등록: 등록일 기준 / 등록된 판매처에 부과</li>
-                        <li>- 관리자취소 or 만료취소: 취소 or 만료일 기준 / 플랫폼 운영기관에 부과</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>자동생성</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>
-                      자동생성 건은 상태값에 따라 집계
-                      <ul style={s.subList}>
-                        <li>- 생성성공 문자: 지정된 판매처에 부과</li>
-                        <li>- 생성실패 문자: 플랫폼 운영기관에 부과</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>만료예정</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>만료예정 알림톡 발송일 기준 / 발송시점 상품권 보유 판매처에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>가맹점 승인</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>발송일 기준 / 플랫폼 운영기관에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>FDS</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>FDS 이상거래 대상 선정 가맹점 대표자 휴대폰번호로 알림톡 발송 건수 / 플랫폼 운영기관에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>기타</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>다른 항목에 속하지 않은 모든 건수 / 발송일 기준 / 플랫폼 운영기관에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>관리자 인증 및 임시 비밀번호</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>발송일 기준 / 플랫폼 운영기관에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>기타</td>
-                <td>
-                  <ul style={s.list}>
-                    <li>관리자인증 & 임시 비밀번호가 아닌 모든 건수 / 발송일 기준 / 플랫폼 운영기관에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-              <tr>
-                <td>회원인증</td>
-                <td
-                  style={{
-                    borderRight: "1px solid var(--color-border-default)",
-                    borderLeft: "1px solid var(--color-border-default)",
-                  }}>
-                  본인인증
-                </td>
-                <td>
-                  <ul style={s.list}>
-                    <li>인증 발생일자 기준 / 발행한 판매처에 부과</li>
-                  </ul>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </Dialog>
     </div>
   );
 }
 
+/** 집계 기준 안내 표의 내용 */
+const BASIS_ROWS = [
+  { label: "개인선물", rules: ["발송일 기준 / 발송된 판매처에 부과"] },
+  {
+    label: "대량선물",
+    rules: [
+      "대량선물과 자동생성 건을 합산하여 집계",
+      "등록 건은 등록일 기준 / 등록된 판매처에 부과",
+      "관리자취소·만료취소 건은 취소일 기준 / 플랫폼 운영기관에 부과",
+    ],
+  },
+  { label: "만료예정", rules: ["만료예정 알림톡 발송일 기준 / 발송 시점에 상품권을 보유한 판매처에 부과"] },
+  { label: "기타", rules: ["위 항목에 속하지 않은 모든 건수 / 발송일 기준 / 플랫폼 운영기관에 부과"] },
+];
+
 const s: Record<string, CSSProperties> = {
   list: {
+    margin: 0,
     paddingLeft: 16,
     lineHeight: 1.7,
   },
-  subList: {
-    paddingLeft: 0,
-    listStyleType: "none",
-    color: "var(--color-text-secondary)",
+  channelCell: {
+    borderLeft: "1px solid var(--color-gray-100)",
+    borderRight: "1px solid var(--color-gray-100)",
+    verticalAlign: "middle",
+    textAlign: "center",
   },
 };
