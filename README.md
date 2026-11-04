@@ -62,7 +62,10 @@ src/
   layout/         앱 화면 틀 (Sidebar)
   menus/          사이드바 메뉴별 화면
     menuConfig.ts   메뉴 그룹·라벨·아이콘 정의
-    m110100_user/ … m111100_system/  대메뉴별 화면
+    wallet/         고객 지갑 (지갑 조회, 충전·사용 내역)
+    voucher/        상품권 관리 (상품권, 상품권 그룹)
+    service/        고객센터 (일괄 수기처리, 상품권 양도)
+    stats/          통계 (알림 발송 통계)
   pages/          로그인, 메인 등 주소 단위 화면
   styles/         공통 토큰·레이아웃·테이블·AG Grid 스타일
   utils/          날짜·숫자·AG Grid 컬럼 유틸
@@ -112,7 +115,7 @@ import { TextInput, Select } from "@xoheeoh/components";
 
 ### 2. 신규 탭 메뉴는 `src/menus/`에 추가
 
-1. 대메뉴 폴더에 페이지 파일(또는 폴더) 추가 — 예: `m110500_settlement/Page110501.tsx`
+1. 대메뉴 폴더에 페이지 파일(또는 폴더) 추가 — 예: `wallet/WalletList.tsx`
 2. 해당 폴더의 `index.ts`에서 export
 3. `menuConfig.ts`에 메뉴 항목(id, label, 그룹) 등록
 4. `MenuContent.tsx`에서 메뉴 id ↔ 페이지 컴포넌트 매핑
@@ -122,20 +125,20 @@ import { TextInput, Select } from "@xoheeoh/components";
 **단순 화면** (모달·서브패널 등 부가 UI가 없음)은 단일 파일로 둡니다.
 
 ```
-menus/m110500_settlement/
-  Page110501.tsx    ← 화면 본문
+menus/stats/
+  SendingStats.tsx    ← 화면 본문
   index.ts
 ```
 
 **복합 화면** (모달, 등록/수정 패널 등 하위 UI가 있음)은 메뉴 단위로 폴더화합니다.
 
 ```
-menus/m110900_service/Page110903_BulkProcess/
+menus/service/BulkProcess/
   index.tsx                 ← 진입점
   BulkRequestPanel.tsx
   BulkRequestPanel.module.css
 
-menus/m110200_voucher/Page110201_VoucherManage/
+menus/voucher/VoucherManage/
   index.tsx
   edit/ … register/ …       ← 하위 패널·모달
 ```

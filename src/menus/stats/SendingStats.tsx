@@ -136,7 +136,7 @@ export default function SendingStats() {
 
   const gridRef = useRef<AgGridReact<SendingStatsRow>>(null);
   const handleExcelDownload = () => {
-    if (gridRef.current) exportGridToExcel(gridRef.current.api, "발송 통계");
+    if (gridRef.current) exportGridToExcel(gridRef.current.api, "알림 발송 통계");
   };
 
   const getRowClass = (params: RowClassParams<SendingStatsRow>) =>
@@ -145,7 +145,7 @@ export default function SendingStats() {
   return (
     <div className="page-root">
       <div className="page-title">
-        <h3 className="text-heading3">발송 통계</h3>
+        <h3 className="text-heading3">알림 발송 통계</h3>
         <p className="text-body2 text-color-secondary">
           시스템에서 발송된 문자(알림톡, LMS 등)의 발송 통계를 조회합니다.
         </p>
