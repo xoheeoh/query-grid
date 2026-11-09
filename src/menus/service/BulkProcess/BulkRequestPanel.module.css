@@ -38,3 +38,38 @@
 .fileInput :global(input[type="file"])::-webkit-file-upload-button {
   display: none;
 }
+
+/* ===== 상세 창의 정보 묶음 (이름표 위, 값 아래) ===== */
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.detailLabel {
+  font-size: var(--text-caption1-size);
+  color: var(--color-gray-500);
+}
+
+.detailValue {
+  margin: 0;
+  font-size: var(--text-subtitle3-size);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  overflow-wrap: anywhere;
+}
+
+/* 공통 .table 규칙(왼쪽 정렬)보다 구체적으로 적어야 오른쪽 정렬이 이긴다. */
+.detailGrid ~ table th.amountCell,
+.detailGrid ~ table td.amountCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

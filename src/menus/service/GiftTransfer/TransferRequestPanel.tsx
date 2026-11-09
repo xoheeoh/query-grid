@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef } from "ag-grid-community";
-import { Banner, Button, Icon, IconButton, TextInput } from "@xoheeoh/components";
+import { Alert, Banner, Button, Icon, IconButton, TextInput, useToast } from "@xoheeoh/components";
 import { mdiAccountOutline, mdiArrowLeft, mdiArrowRightBold, mdiListBoxOutline } from "@mdi/js";
 import { useSubviewLock } from "@menus/SubviewLockContext";
-import { COL } from "@utils";
+import { COL, formatAmount, refreshRowNumbers } from "@utils";
 import styles from "./TransferRequestPanel.module.css";
 
 type TransferRequestPanelProps = {
@@ -61,6 +61,27 @@ export default function TransferRequestPanel({ onClose }: TransferRequestPanelPr
   const [showTransferResult, setShowTransferResult] = useState(false);
   const [rowData, setRowData] = useState<giftCardInfoRow[]>([]);
   const isTransferable = true; // 결과 화면 테스트를 위한 임시값
+  const toast = useToast();
+  const gridRef = useRef<AgGridReact<giftCardInfoRow>>(null);
+  /** 표에서 체크한 상품권. 확인창을 띄울 때 읽어 둔다. */
+  const [selectedRows, setSelectedRows] = useState<giftCardInfoRow[] | null>(null);
+
+  /** 체크한 상품권이 있어야 확인창을 띄운다. */
+  const handleRequestClick = () => {
+    const selected = gridRef.current?.api.getSelectedRows() ?? [];
+    if (selected.length === 0) {
+      toast.warning("양도할 상품권을 표에서 선택해 주세요.");
+      return;
+    }
+    setSelectedRows(selected);
+  };
+
+  // 데모라 서버 요청 없이 바로 완료 처리한다.
+  const handleRequestConfirm = () => {
+    setSelectedRows(null);
+    toast.success("상품권 양도 요청이 등록되었습니다.");
+    onClose();
+  };
 
   const columnDefs = useMemo<ColDef<giftCardInfoRow>[]>(
     () => [
@@ -209,7 +230,9 @@ export default function TransferRequestPanel({ onClose }: TransferRequestPanelPr
                   <AgGridProvider modules={[AllCommunityModule]}>
                     <div className="ag-theme-alpine grid-fill-wrap">
                       <AgGridReact<giftCardInfoRow>
+                        ref={gridRef}
                         theme="legacy"
+                        onModelUpdated={refreshRowNumbers}
                         rowData={rowData}
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
@@ -246,9 +269,24 @@ export default function TransferRequestPanel({ onClose }: TransferRequestPanelPr
       <div className="page-subview-footer" style={{ justifyContent: "flex-end" }}>
         <div className="row-center gap-8">
           <Button variant="outlined" color="neutral" onClick={onClose} label="취소" />
-          <Button onClick={() => {}} label="양도 요청" />
+          <Button disabled={!showTransferResult || !isTransferable} onClick={handleRequestClick} label="양도 요청" />
         </div>
       </div>
+
+      <Alert
+        open={selectedRows !== null}
+        onClose={() => setSelectedRows(null)}
+        title="상품권 양도 요청"
+        message={
+          selectedRows
+            ? `상품권 ${selectedRows.length}장, 잔액 합계 ${formatAmount(
+                selectedRows.reduce((sum, row) => sum + row.balance, 0),
+              )}원을 양도 요청합니다.\n양도한 잔액은 되돌릴 수 없습니다. 계속하시겠습니까?`
+            : ""
+        }
+        secondaryAction={{ label: "취소" }}
+        primaryAction={{ label: "요청", onClick: handleRequestConfirm }}
+      />
     </div>
   );
 }

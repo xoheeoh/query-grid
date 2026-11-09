@@ -140,7 +140,9 @@ export default function VoucherGroupEditPanel({ onClose, initialData }: VoucherG
 
               <div className={styles.content}>
                 <div className="row-center gap-8">
-                  <span className="grid-count-badge">{selectedVoucherIds.length} 개</span>
+                  <span className="result-count">
+                    <strong>{selectedVoucherIds.length}</strong>개
+                  </span>
                   <span className="text-caption1">상품권이 선택되었습니다.</span>
                 </div>
 

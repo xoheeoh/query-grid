@@ -1,8 +1,17 @@
-import type { ColDef, ValueFormatterParams } from "ag-grid-community";
+import type { ColDef, ModelUpdatedEvent, ValueFormatterParams } from "ag-grid-community";
 import { formatAmount, formatDate } from "./numberUtils";
 
 /** 전 화면 공통 No 컬럼 폭 */
 export const AG_GRID_NO_WIDTH = 72;
+
+/**
+ * 순번(No) 열을 다시 그린다.
+ * AG Grid는 줄이 추가·정렬·페이지 이동으로 자리만 바뀌면 칸을 다시 그리지 않아서, 자리 번호를 쓰는 No 열이 옛 값으로 남는다.
+ * 모든 표의 onModelUpdated에 이 함수를 넣는다.
+ */
+export function refreshRowNumbers(event: ModelUpdatedEvent) {
+  event.api.refreshCells({ columns: ["no"], force: true });
+}
 
 type ColOpts<TData> = Omit<ColDef<TData>, "headerName" | "field">;
 
@@ -29,12 +38,19 @@ function withField<TData>(field: string | undefined): Pick<ColDef<TData>, "field
  * - no: 순번 → 중앙, 전 화면 동일 폭
  */
 export const COL = {
+  /**
+   * 순번. 데이터의 id가 아니라 표에 보이는 순서(정렬·페이지 반영)를 1부터 센다.
+   * field는 열 식별용으로만 쓰고 값은 자리 번호에서 만든다.
+   */
   no: <TData = unknown>(field: string = "id", opts?: ColOpts<TData>): ColDef<TData> => ({
     headerName: "No",
     field: field as ColDef<TData>["field"],
+    colId: "no",
     width: AG_GRID_NO_WIDTH,
     headerClass: "ag-header-right",
     cellStyle: { textAlign: "right" },
+    valueGetter: (params) => (params.node?.rowIndex == null ? "" : params.node.rowIndex + 1),
+    sortable: false,
     ...opts,
   }),
 

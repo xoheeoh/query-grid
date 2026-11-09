@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ColGroupDef, RowClassParams } from "ag-grid-community";
-import { COL, exportGridToExcel, toDateValue } from "@utils";
+import { COL, exportGridToExcel, refreshRowNumbers, toDateValue } from "@utils";
 import { Button, DateField, Dialog, Icon, TextButton } from "@xoheeoh/components";
 import { mdiHelpCircleOutline } from "@mdi/js";
 
@@ -212,6 +212,7 @@ export default function SendingStats() {
             <AgGridReact<SendingStatsRow>
               ref={gridRef}
               theme="legacy"
+              onModelUpdated={refreshRowNumbers}
               rowData={rowData}
               pinnedTopRowData={pinnedTopRowData}
               columnDefs={columnDefs}

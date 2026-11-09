@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, type ColDef } from "ag-grid-community";
-import { COL, exportGridToExcel, toDateValue } from "@utils";
+import { COL, exportGridToExcel, refreshRowNumbers, toDateValue } from "@utils";
 import { Button, DateField, Select, TextButton, TextInput } from "@xoheeoh/components";
 
 /** 고객 한 명의 기간 내 충전·사용 합계 */
@@ -255,6 +255,7 @@ export default function WalletHistory() {
             <AgGridReact<WalletHistoryRow>
               ref={gridRef}
               theme="legacy"
+              onModelUpdated={refreshRowNumbers}
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}

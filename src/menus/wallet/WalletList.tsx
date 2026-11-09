@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-grid-community";
-import { COL, exportGridToExcel } from "@utils";
+import { COL, exportGridToExcel, refreshRowNumbers } from "@utils";
 import { Button, DateField, Select, TextButton, TextInput } from "@xoheeoh/components";
 import {
   MOCK_WALLET_ROWS,
@@ -216,6 +216,7 @@ export default function WalletList() {
             <AgGridReact<WalletRow>
               ref={gridRef}
               theme="legacy"
+              onModelUpdated={refreshRowNumbers}
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}

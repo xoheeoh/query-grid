@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-grid-community";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
-import { COL, formatThousandInput, parseThousandInput, toDateValue } from "@utils";
+import { COL, formatThousandInput, parseThousandInput, refreshRowNumbers, toDateValue } from "@utils";
 import { Banner, Button, DateField, Dialog, TextInput, Select } from "@xoheeoh/components";
 import styles from "../VoucherManagePanel.module.css";
 
@@ -209,12 +209,15 @@ export function LimitHistoryModal({ kind, onClose, onSave }: LimitHistoryModalPr
         </div>
 
         <div className={styles.modalGridPanel}>
-          <span className="grid-count-badge">총 {rowData.length.toLocaleString("ko-KR")} 건</span>
+          <span className="result-count">
+            총 <strong>{rowData.length.toLocaleString("ko-KR")}</strong>건
+          </span>
 
           <AgGridProvider modules={[AllCommunityModule]}>
             <div className="ag-theme-alpine grid-fill-wrap">
               <AgGridReact<LimitRow>
                 theme="legacy"
+                onModelUpdated={refreshRowNumbers}
                 rowData={rowData}
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}

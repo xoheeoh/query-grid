@@ -4,7 +4,7 @@ import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ColDef, ICellRendererParams } from "ag-grid-community";
 
 import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
-import { COL } from "@utils";
+import { COL, refreshRowNumbers } from "@utils";
 import VoucherGroupEditPanel from "./edit/VoucherGroupEditPanel";
 import VoucherGroupRegisterPanel from "./register/VoucherGroupRegisterPanel";
 
@@ -165,6 +165,7 @@ export default function VoucherGroupManage() {
           <div className="ag-theme-alpine grid-fill-wrap">
             <AgGridReact<VoucherGroupRow>
               theme="legacy"
+              onModelUpdated={refreshRowNumbers}
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}

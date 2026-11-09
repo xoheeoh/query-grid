@@ -5,7 +5,7 @@ import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-gr
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import { COL, formatThousandInput } from "@utils";
+import { COL, formatThousandInput, refreshRowNumbers } from "@utils";
 import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
 import { VoucherFormPanel, type VoucherFormValues } from "./form";
 import {
@@ -308,6 +308,7 @@ export default function VoucherManage() {
           <div className="ag-theme-alpine grid-fill-wrap">
             <AgGridReact<VoucherRow>
               theme="legacy"
+              onModelUpdated={refreshRowNumbers}
               rowData={rowData}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
