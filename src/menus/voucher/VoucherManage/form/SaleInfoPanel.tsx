@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useState, type ChangeEvent, type React
 import { Banner, Button, Checkbox, Icon, TextInput, Select, TabPanel } from "@xoheeoh/components";
 import { mdiStorefrontCheckOutline, mdiStoreMarkerOutline } from "@mdi/js";
 import { formatThousandInput } from "@utils";
-import { FormField } from "../FormField";
+import { FormField } from "../../../FormField";
 import { SELLER_OPTIONS, type Option } from "../voucherOptions";
 import type { FormPanelHandle } from "./types";
 import styles from "../VoucherManagePanel.module.css";

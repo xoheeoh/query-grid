@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import styles from "./VoucherManagePanel.module.css";
+import styles from "./FormField.module.css";
 
 /**
  * 입력 컴포넌트에 그대로 펼쳐 넣는 속성 묶음이다.
@@ -37,7 +37,7 @@ export function FormField({ label, required, error, full, children }: FormFieldP
 
   return (
     <div className={`${styles.field} ${full ? "grid-col-full" : ""}`}>
-      <span id={labelId} className={`text-body2 ${styles.tableLabel}`}>
+      <span id={labelId} className={`text-body2 ${styles.label}`}>
         {label}
         {required && (
           <span className={styles.required} aria-hidden="true">
@@ -47,7 +47,7 @@ export function FormField({ label, required, error, full, children }: FormFieldP
         )}
       </span>
 
-      <div className={styles.fieldBody}>
+      <div className={styles.body}>
         {children(control)}
         {error && (
           <p id={errorId} className={`text-caption1 ${styles.errorText}`}>

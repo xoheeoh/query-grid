@@ -5,8 +5,7 @@ import { AllCommunityModule, ColDef, ICellRendererParams } from "ag-grid-communi
 
 import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
 import { COL, refreshRowNumbers } from "@utils";
-import VoucherGroupEditPanel from "./edit/VoucherGroupEditPanel";
-import VoucherGroupRegisterPanel from "./register/VoucherGroupRegisterPanel";
+import VoucherGroupFormPanel from "./VoucherGroupFormPanel";
 
 const PUBLISHER_OPTIONS = [{ label: "전체", value: "all" }];
 
@@ -187,9 +186,14 @@ export default function VoucherGroupManage() {
         </AgGridProvider>
       </div>
 
-      {isRegisterOpen && <VoucherGroupRegisterPanel onClose={() => setIsRegisterOpen(false)} />}
+      {isRegisterOpen && <VoucherGroupFormPanel mode="register" onClose={() => setIsRegisterOpen(false)} />}
       {editingVoucherGroup && (
-        <VoucherGroupEditPanel initialData={editingVoucherGroup} onClose={() => setEditingVoucherGroup(null)} />
+        <VoucherGroupFormPanel
+          mode="edit"
+          // 목록에는 포함 상품권 목록이 없어서 데모용으로 앞 3개를 고른 상태로 연다.
+          initialValues={{ groupName: editingVoucherGroup.voucherGroupName, selectedVoucherIds: ["1", "2", "3"] }}
+          onClose={() => setEditingVoucherGroup(null)}
+        />
       )}
     </div>
   );

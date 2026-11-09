@@ -1,0 +1,29 @@
+/* 등록·수정 화면의 한 줄(라벨 + 입력칸 + 오류 문구) */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.required {
+  color: var(--color-red-500);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--color-red-500);
+}

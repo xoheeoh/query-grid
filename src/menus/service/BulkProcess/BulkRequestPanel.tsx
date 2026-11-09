@@ -4,6 +4,7 @@ import { AllCommunityModule, type ColDef } from "ag-grid-community";
 import { Alert, Banner, Button, Icon, IconButton, TextInput, Select, useToast } from "@xoheeoh/components";
 import { mdiArrowLeft, mdiFileArrowUpDownOutline, mdiFileCheckOutline } from "@mdi/js";
 import { useSubviewLock } from "@menus/SubviewLockContext";
+import { useSubviewEscape } from "@menus/useSubviewEscape";
 import { COL, downloadExcelTemplate, exportGridToExcel, refreshRowNumbers } from "@utils";
 import { EXTEND_HEADERS, REFUND_HEADERS, readUploadFile, type UploadKind, type UploadRow } from "./readUploadFile";
 import styles from "./BulkRequestPanel.module.css";
@@ -45,8 +46,10 @@ async function downloadTemplate(option: (typeof TEMPLATE_DOWNLOAD_OPTIONS)[numbe
 export default function BulkRequestPanel({ onClose, onSubmitted }: BulkRequestPanelProps) {
   useSubviewLock();
 
+  const panelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
+  const [isLeaveOpen, setIsLeaveOpen] = useState(false);
   const [templateSelectValue, setTemplateSelectValue] = useState("");
   const [uploadKind, setUploadKind] = useState<UploadKind>("refund");
   const [rowData, setRowData] = useState<FileCheckResultRow[]>([]);
@@ -57,6 +60,13 @@ export default function BulkRequestPanel({ onClose, onSubmitted }: BulkRequestPa
   const [isCheckAlertOpen, setIsCheckAlertOpen] = useState(false);
   const [isSubmitAlertOpen, setIsSubmitAlertOpen] = useState(false);
   const toast = useToast();
+
+  /** 파일을 올려 둔 상태면 나갈 때 한 번 묻는다. */
+  const requestClose = () => {
+    if (isFileUploaded) setIsLeaveOpen(true);
+    else onClose();
+  };
+  useSubviewEscape(panelRef, requestClose);
 
   const rowErrorCount = rowData.filter((row) => row.rowError).length;
   /** 확인 단계에서 "가능"으로 끝난 줄 수 */
@@ -159,6 +169,7 @@ export default function BulkRequestPanel({ onClose, onSubmitted }: BulkRequestPa
 
   return (
     <div
+      ref={panelRef}
       className="page-subview"
       role="dialog"
       aria-modal="true"
@@ -171,7 +182,7 @@ export default function BulkRequestPanel({ onClose, onSubmitted }: BulkRequestPa
             <IconButton
               variant="outlined"
               color="neutral"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="대량 처리 요청 닫기"
               icon={<Icon path={mdiArrowLeft} />}
             />
@@ -317,10 +328,19 @@ export default function BulkRequestPanel({ onClose, onSubmitted }: BulkRequestPa
 
       <div className="page-subview-footer" style={{ justifyContent: "flex-end" }}>
         <div className="row-center gap-8">
-          <Button variant="outlined" color="neutral" onClick={onClose} label="목록으로" />
+          <Button variant="outlined" color="neutral" onClick={requestClose} label="목록으로" />
           <Button disabled={!isChecked} onClick={() => setIsSubmitAlertOpen(true)} label="요청 등록" />
         </div>
       </div>
+
+      <Alert
+        open={isLeaveOpen}
+        onClose={() => setIsLeaveOpen(false)}
+        title="요청 취소"
+        message={"올린 파일과 확인 결과가 사라집니다.\n요청을 등록하지 않고 나가시겠습니까?"}
+        secondaryAction={{ label: "계속 작성" }}
+        destructiveAction={{ label: "나가기", onClick: onClose }}
+      />
 
       <Alert
         open={isCheckAlertOpen}

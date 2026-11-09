@@ -18,10 +18,6 @@
   gap: 12px;
 }
 
-.tableLabel {
-  flex-shrink: 0;
-  min-width: 120px;
-}
 
 .required {
   color: var(--color-red-500);
@@ -49,19 +45,14 @@
   background: var(--color-primary-50);
 }
 
+/* 하나도 안 골랐다고 지적받은 상태 */
+.voucherItemError {
+  border-color: var(--color-red-300);
+}
+
 .voucherCheckbox {
   width: 100%;
   padding: 16px 20px;
   align-items: flex-start;
 }
 
-.voucherEmpty {
-  background-color: var(--color-gray-50);
-  border: 1px dashed var(--color-border-default);
-  border-radius: var(--r-sm);
-  padding: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-}

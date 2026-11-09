@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Button, IconButton, Icon, Tab, TabList, Tabs, useToast } from "@xoheeoh/components";
 import { mdiArrowLeft } from "@mdi/js";
 import { useSubviewLock } from "../../../SubviewLockContext";
+import { useSubviewEscape } from "../../../useSubviewEscape";
 import { BasicInfoPanel, type VoucherBasicValues } from "./BasicInfoPanel";
 import { SaleInfoPanel, type VoucherSaleValues } from "./SaleInfoPanel";
 import type { FormPanelHandle } from "./types";
@@ -102,22 +103,7 @@ export function VoucherFormPanel({ mode, initialValues, onClose }: VoucherFormPa
     onClose();
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      const target = event.target as HTMLElement | null;
-      // 알림창·모달 안에서 누른 Esc는 그쪽이 처리한다. 이 화면까지 같이 닫히면 안 된다.
-      const nearestDialog = target?.closest('[role="dialog"], [role="alertdialog"]') ?? null;
-      if (nearestDialog && nearestDialog !== panelRef.current) return;
-      // 포커스가 본문으로 빠진 경우: 알림창이 떠 있지 않을 때만 이 화면을 닫는다.
-      if (!nearestDialog && document.querySelector('[role="alertdialog"], [role="dialog"]:not(.page-subview)')) return;
-      // 열려 있는 드롭다운은 자기가 닫는다.
-      if (target?.closest('[aria-expanded="true"]')) return;
-      requestClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  });
+  useSubviewEscape(panelRef, requestClose);
 
   return (
     <div

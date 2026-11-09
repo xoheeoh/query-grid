@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type Chan
 import { Button, Icon, RadioGroup, Select, TabPanel, TextInput, useToast } from "@xoheeoh/components";
 import { mdiClose, mdiImagePlusOutline, mdiListBoxOutline, mdiPlaylistEdit } from "@mdi/js";
 import { formatThousandInput, onlyDigits } from "@utils";
-import { FormField, type FieldControlProps } from "../FormField";
+import { FormField, type FieldControlProps } from "../../../FormField";
 import { CATEGORY_OPTIONS, PUBLISHER_OPTIONS, VALIDITY_PERIOD_OPTIONS, VALIDITY_TYPE_OPTIONS } from "../voucherOptions";
 import { LIMIT_MODAL_PRESETS, LimitHistoryModal, type LimitModalKind } from "./LimitHistoryModal";
 import type { FormPanelHandle } from "./types";

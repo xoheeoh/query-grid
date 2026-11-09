@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Button, Icon, IconButton, useToast } from "@xoheeoh/components";
 import { mdiAccountOutline, mdiArrowLeft, mdiHistory, mdiTicketPercentOutline } from "@mdi/js";
 import { formatAmount, formatDate } from "@utils";
+import { useSubviewEscape } from "../useSubviewEscape";
 import {
   TRANSACTION_TYPE_BADGE,
   TRANSACTION_TYPE_LABEL,
@@ -34,20 +35,7 @@ export function WalletDetailPanel({ wallet, onClose, onStatusChange }: WalletDet
     setPendingStatus(null);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      const target = event.target as HTMLElement | null;
-      const nearestDialog = target?.closest('[role="dialog"], [role="alertdialog"]') ?? null;
-      // 확인창 안에서 누른 Esc는 확인창만 닫는다.
-      if (nearestDialog && nearestDialog !== panelRef.current) return;
-      // 버튼이 바뀌면서 포커스가 본문으로 빠진 경우: 확인창이 떠 있지 않을 때만 이 화면을 닫는다.
-      if (!nearestDialog && document.querySelector('[role="alertdialog"]')) return;
-      onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  useSubviewEscape(panelRef, onClose);
 
   return (
     <div
