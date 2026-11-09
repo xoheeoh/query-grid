@@ -1,0 +1,358 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 20px;
+  overflow: auto;
+}
+
+/* ===== 숫자 카드 ===== */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 카드 전체가 버튼이다. 누르면 관련 화면으로 간다. */
+.tile {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  border: 1px solid var(--color-gray-150);
+  border-radius: var(--r-lg);
+  background: var(--color-white);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.tile:hover {
+  border-color: var(--color-gray-300);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.tileLabel {
+  font-size: var(--text-body2-size);
+  color: var(--color-gray-600);
+}
+
+.tileValue {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  line-height: 1.2;
+  color: var(--color-gray-900);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileUnit {
+  margin-left: 2px;
+  font-size: var(--text-subtitle3-size);
+  font-weight: 500;
+  color: var(--color-gray-600);
+}
+
+.tileSub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-caption1-size);
+  color: var(--color-gray-500);
+}
+
+.up {
+  color: var(--color-green-700);
+}
+
+.down {
+  color: var(--color-red-700);
+}
+
+/* ===== 아래 두 열: 그래프(넓게) + 할 일·비중(좁게) ===== */
+/* 두 열의 바닥이 맞도록 늘린다(stretch). 그래프 카드가 오른쪽 카드 두 개 높이에 맞춰 커진다. */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-gray-150);
+  border-radius: var(--r-lg);
+  background: var(--color-white);
+}
+
+.cardTitle {
+  padding: 16px 20px 0;
+}
+
+/*
+ * 카드 안쪽 여백은 목록에만 준다. 두 목록 모두 제목과 첫 줄 사이가 12px, 마지막 줄과 카드 아래가 16px로 보이게 맞춘다.
+ * 처리할 일은 항목 자체에 위아래 10px 여백이 있어서 그만큼 뺀다.
+ */
+.pendingList {
+  margin: 2px 20px 6px;
+}
+
+.shareList {
+  margin: 12px 20px 16px;
+}
+
+/* ===== 그래프 ===== */
+.chart {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid var(--color-gray-150);
+  border-radius: var(--r-lg);
+  background: var(--color-white);
+}
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-caption1-size);
+  color: var(--color-gray-700);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-full);
+  flex-shrink: 0;
+}
+
+/*
+ * 카드에서 제목을 뺀 나머지 높이를 그래프가 채운다. 너비·높이는 TrendChart가 재서 SVG에 넣는다.
+ * SVG는 절대 위치로 띄워서 상자 높이에 영향을 주지 않게 한다. 그래야 "재서 넣은 높이가 상자를 다시 키우는" 되먹임이 없다.
+ */
+.chartPlot {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 240px;
+}
+
+.chartPlot > svg {
+  position: absolute;
+  inset: 0;
+}
+
+/* 표로 보기도 그래프와 같은 높이를 쓴다. 스크롤 영역을 절대 위치로 두어 표 길이가 카드를 키우지 않게 한다. */
+.chartTableWrap {
+  position: relative;
+  flex: 1;
+  min-height: 240px;
+}
+
+.chartTableScroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+
+.gridLine {
+  stroke: var(--color-gray-100);
+  stroke-width: 1;
+}
+
+.axisText {
+  font-size: 11px;
+  fill: var(--color-gray-500);
+}
+
+.crosshair {
+  stroke: var(--color-gray-300);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 1;
+  min-width: 150px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-150);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  font-size: var(--text-caption1-size);
+  pointer-events: none;
+  transform: translateX(12px);
+}
+
+.tooltip[data-side="left"] {
+  transform: translateX(calc(-100% - 12px));
+}
+
+.tooltipDate {
+  margin-bottom: 4px;
+  color: var(--color-gray-500);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltipRow > strong {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.amountCell {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 처리 대기 ===== */
+.pendingList {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style: none;
+}
+
+.pendingItem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-gray-100);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pendingItem:last-child {
+  border-bottom: 0;
+}
+
+.pendingItem:hover .pendingLabel {
+  color: var(--color-primary-800);
+}
+
+.pendingItem:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+  border-radius: var(--r-sm);
+}
+
+.pendingLabel {
+  color: var(--color-gray-700);
+}
+
+.pendingValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-gray-900);
+}
+
+.pendingValue > svg {
+  color: var(--color-gray-400);
+}
+
+/* ===== 상품권별 잔액 ===== */
+.shareList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.shareRow {
+  display: grid;
+  grid-template-columns: 110px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-caption1-size);
+}
+
+.shareName {
+  color: var(--color-gray-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* span이라 display를 block으로 줘야 높이가 먹는다. */
+.shareBar {
+  display: block;
+  height: 8px;
+  border-radius: var(--r-full);
+  background: var(--color-gray-100);
+  overflow: hidden;
+}
+
+.shareFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--color-primary-800);
+}
+
+.shareValue {
+  text-align: right;
+  color: var(--color-gray-900);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

@@ -211,7 +211,7 @@ function MainPageContent() {
             onCloseMany={closeTabs}
           />
           <div className={styles.contentBody}>
-            <MenuContent tabId={activeTab} />
+            <MenuContent tabId={activeTab} onOpenMenu={openMenu} />
           </div>
         </main>
       </div>
