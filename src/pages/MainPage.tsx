@@ -35,6 +35,7 @@ function MainPageContent() {
   const [activeTab, setActiveTab] = useState<TabId | null>(null);
   /** 서브뷰 잠금 중 화면 이동 대기 — 탭 전환·사이드바 메뉴 클릭 확인 Dialog용 */
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
+  const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
   const { isLocked } = useSubviewLockState();
   // 로그인 화면에서 저장한 사용자 정보. 로그인 없이 바로 들어오면 없다.
   const session = getLoginSession();
@@ -124,6 +125,11 @@ function MainPageContent() {
     setPendingTab(null);
   }
 
+  /** 로그아웃은 실수로 누르기 쉬워서 확인창을 한 번 거친다. */
+  function handleLogoutClick() {
+    setIsLogoutAlertOpen(true);
+  }
+
   function handleLogout() {
     clearLoginSession();
     window.location.href = "/";
@@ -184,7 +190,7 @@ function MainPageContent() {
       </header>
 
       <div className={styles.body}>
-        <Sidebar className={styles.sidebar} aria-label="주 메뉴" onLogout={handleLogout}>
+        <Sidebar className={styles.sidebar} aria-label="주 메뉴" onLogout={handleLogoutClick}>
           {MENU_GROUPS.map((group) => (
             <SidebarGroup key={group.title} title={group.title} icon={group.icon}>
               {group.items.map((item) => (
@@ -217,6 +223,15 @@ function MainPageContent() {
         message={"저장하지 않은 내용은 모두 초기화됩니다.\n화면을 이동하시겠습니까?"}
         secondaryAction={{ label: "취소" }}
         primaryAction={{ label: "확인", onClick: handleConfirmLeave }}
+      />
+
+      <Alert
+        open={isLogoutAlertOpen}
+        onClose={() => setIsLogoutAlertOpen(false)}
+        title="로그아웃"
+        message={"로그아웃하면 열어 둔 화면이 모두 닫힙니다.\n로그아웃하시겠습니까?"}
+        secondaryAction={{ label: "취소" }}
+        primaryAction={{ label: "로그아웃", onClick: handleLogout }}
       />
     </div>
   );
