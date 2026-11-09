@@ -19,8 +19,8 @@ export function onlyDigits(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-/** 숫자를 날짜/시간 문자열로 변환한다. */
-export function formatDate(value: Date): string {
+/** 날짜(Date) 또는 yyyyMMdd·yyyyMMddHHmm 형태의 문자열을 "yyyy-MM-dd HH:mm" 꼴로 바꾼다. */
+export function formatDate(value: Date | string): string {
   if (!value) return "";
   const s = onlyDigits(String(value));
 

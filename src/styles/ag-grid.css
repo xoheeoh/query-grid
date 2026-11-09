@@ -252,3 +252,13 @@
   background: var(--color-red-50);
   color: var(--color-red-700);
 }
+
+.status-badge-info {
+  background: var(--color-blue-50);
+  color: var(--color-blue-700);
+}
+
+.status-badge-neutral {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
