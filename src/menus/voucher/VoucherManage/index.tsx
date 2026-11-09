@@ -5,7 +5,7 @@ import { AllCommunityModule, type ColDef, type ICellRendererParams } from "ag-gr
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
-import { COL, formatThousandInput, refreshRowNumbers } from "@utils";
+import { appPath, COL, formatThousandInput, refreshRowNumbers } from "@utils";
 import { Button, TextButton, TextInput, Select } from "@xoheeoh/components";
 import { VoucherFormPanel, type VoucherFormValues } from "./form";
 import {
@@ -77,7 +77,7 @@ const MOCK_ROWS: VoucherRow[] = [
 ];
 
 /** 수정 화면에 보여줄 샘플 이미지 */
-const SAMPLE_VOUCHER_IMAGE = "/img/upload_sample.jpg";
+const SAMPLE_VOUCHER_IMAGE = appPath("/img/upload_sample.jpg");
 
 /** 목록 한 줄을 수정 폼의 값으로 바꾼다. 목록에 없는 항목은 데모용 예시 값으로 채운다. */
 function toFormValues(row: VoucherRow): VoucherFormValues {

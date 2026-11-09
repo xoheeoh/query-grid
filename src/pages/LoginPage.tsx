@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Alert, Banner, Button, Checkbox, Dialog, TextInput } from "@xoheeoh/components";
-import { saveLoginSession } from "@utils";
+import { appPath, saveLoginSession } from "@utils";
 
 const OTP_DURATION_SEC = 4 * 60 + 59; // 04:59
 
@@ -24,7 +24,7 @@ function formatRemainTime(seconds: number) {
 /** 로그인 성공 처리. 사용자 정보와 접속 시각을 저장하고 메인 화면으로 이동한다. */
 function goToMain() {
   saveLoginSession({ id: DEMO_ACCOUNT.id, name: DEMO_ACCOUNT.name });
-  window.location.assign("/sample");
+  window.location.assign(appPath("/sample"));
 }
 
 /** 로그인 화면 — 성공 시 /sample(MainPage)로 이동 */
@@ -142,7 +142,7 @@ export default function LoginPage() {
     <div style={s.page}>
       <div style={s.wrapper}>
         <h1 style={s.logoContainer}>
-          <img src="/img/logo_color.svg" alt="" style={s.logo} />
+          <img src={appPath("/img/logo_color.svg")} alt="" style={s.logo} />
           <span style={s.logoTitle}>바우처 플랫폼</span>
           <span style={s.logoBadge}>Admin</span>
         </h1>

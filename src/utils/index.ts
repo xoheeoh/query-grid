@@ -4,3 +4,4 @@ export { formatThousandInput, parseThousandInput, formatAmount, formatDate, only
 export { exportGridToExcel, downloadExcelTemplate } from "./excelExport";
 export { saveLoginSession, getLoginSession, clearLoginSession, type LoginSession } from "./loginSession";
 export { maskPhone, maskId } from "./maskUtils";
+export { appPath, isAppRoute } from "./appPath";

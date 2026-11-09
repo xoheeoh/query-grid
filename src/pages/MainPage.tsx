@@ -2,7 +2,7 @@ import { useState } from "react";
 import { mdiAccountOutline, mdiChevronRight } from "@mdi/js";
 import { Alert, Icon, ToastProvider } from "@xoheeoh/components";
 import { Sidebar, SidebarGroup, SidebarItem } from "../layout/Sidebar";
-import { clearLoginSession, getLoginSession } from "@utils";
+import { appPath, clearLoginSession, getLoginSession } from "@utils";
 import {
   ContentTabBar,
   DASHBOARD_TAB_ID,
@@ -132,7 +132,7 @@ function MainPageContent() {
 
   function handleLogout() {
     clearLoginSession();
-    window.location.href = "/";
+    window.location.href = appPath("/");
   }
 
   return (
@@ -140,7 +140,7 @@ function MainPageContent() {
       <header className={styles.header}>
         <div className={`${styles.headerInfoContainer} ${styles.headerLeading}`}>
           <button type="button" className={styles.brand} onClick={openDashboard} aria-label="대시보드로 이동">
-            <img src="/img/logo_color.svg" alt="" width={24} height={24} />
+            <img src={appPath("/img/logo_color.svg")} alt="" width={24} height={24} />
             <div className={styles.brandText}>
               <span className={`text-subtitle2 ${styles.brandTitle}`}>바우처 플랫폼</span>
               <span className={`text-caption1 ${styles.brandBadge}`}>Admin</span>

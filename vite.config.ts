@@ -2,8 +2,10 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Vite 개발 서버 설정. 백엔드가 없는 데모라 API 프록시는 두지 않는다.
+// Vite 설정. 백엔드가 없는 데모라 API 프록시는 두지 않는다.
+// base: 앱이 놓이는 하위 경로. 로컬은 "/", GitHub Pages 배포 때는 워크플로가 BASE_PATH=/query-grid/ 를 넘긴다.
 export default defineConfig({
+  base: process.env.BASE_PATH ?? "/",
   plugins: [react()],
   resolve: {
     alias: {

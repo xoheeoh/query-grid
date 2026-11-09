@@ -57,6 +57,14 @@ npm run dev      # 개발 서버 (http://localhost:5180)
 | `npm run preview` | 빌드 결과 미리보기 |
 | `npm run typecheck` | TypeScript 타입 검사만 |
 
+## 배포 (GitHub Pages)
+
+`main`에 push하면 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)이 자동으로 빌드해서 GitHub Pages에 올립니다. 따로 할 일은 없고, 처음 한 번만 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 바꿔 둡니다.
+
+- 배포 주소: https://xoheeoh.github.io/query-grid/
+- 하위 경로(`/query-grid/`)에 놓이므로 코드에서 `/img/...`, `/sample` 같은 절대 주소는 `appPath()`(`@utils`)로 감싸서 씁니다. 로컬 개발 서버에서는 그대로 `/`가 됩니다.
+- `/sample`을 새로고침해도 열리도록 빌드할 때 `index.html`을 `404.html`로 한 장 더 복사합니다. (GitHub Pages는 없는 주소를 받으면 `404.html`을 내려줍니다.)
+
 ## 기술 구성
 
 - React 18, TypeScript, Vite 5

@@ -6,7 +6,7 @@
   "description": "바우처 플랫폼 Admin 데모 — 선불 지갑 데이터 조회·Excel 다운로드 화면 (React + TypeScript + Vite)",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && cp dist/index.html dist/404.html",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit"
   },
