@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { Alert, Banner, Button, Checkbox, Dialog, TextInput } from "@xoheeoh/components";
-import { appPath, saveLoginSession } from "@utils";
+import { appPath, onlyDigits, saveLoginSession } from "@utils";
 
 const OTP_DURATION_SEC = 4 * 60 + 59; // 04:59
 
@@ -172,19 +172,27 @@ export default function LoginPage() {
           />
 
           {showOtpInput && (
-            <div className="row-end gap-8">
-              <div className="table-item-value" style={{ position: "relative" }}>
-                <TextInput
-                  size="lg"
-                  label="인증코드"
-                  value={otpNo}
-                  onChange={(e) => setOtpNo(e.target.value)}
-                  placeholder="인증코드를 입력해 주세요."
-                />
-
-                <span style={s.remainTime}>{formatRemainTime(remainSeconds)}</span>
+            <div className="flex-col gap-4">
+              <div className="row-end gap-8">
+                <div className="table-item-value">
+                  <TextInput
+                    size="lg"
+                    label="인증코드"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpNo}
+                    onChange={(e) => setOtpNo(onlyDigits(e.target.value))}
+                    placeholder="인증코드 6자리"
+                    status={remainSeconds <= 0 ? "negative" : "default"}
+                    aria-describedby="otp-remain-time"
+                  />
+                </div>
+                <Button size="lg" label="재요청" onClick={handleResendOtp} />
               </div>
-              <Button size="lg" label="재요청" onClick={handleResendOtp} />
+              {/* 남은 시간은 입력칸 안에 두면 지우기(X) 버튼과 겹쳐서 아래 한 줄로 뺀다. */}
+              <span id="otp-remain-time" className="text-caption1 text-color-danger" aria-live="polite">
+                {remainSeconds <= 0 ? "입력 시간이 지났습니다. 재요청을 눌러 주세요." : `남은 시간 ${formatRemainTime(remainSeconds)}`}
+              </span>
             </div>
           )}
 
@@ -307,13 +315,6 @@ const s: Record<string, CSSProperties> = {
     color: "var(--color-primary-800)",
     fontSize: 12,
     fontWeight: 600,
-  },
-  remainTime: {
-    position: "absolute",
-    right: 20,
-    bottom: 14,
-    fontSize: 12,
-    color: "var(--color-danger)",
   },
   footer: {
     marginTop: 16,
