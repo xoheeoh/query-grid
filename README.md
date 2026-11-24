@@ -7,6 +7,10 @@
 
 UI 컴포넌트는 직접 만들어 npm에 배포한 [`@xoheeoh/components`](https://github.com/xoheeoh/components)를 사용합니다.
 
+**바로 보기:** https://xoheeoh.github.io/query-grid/ ([데모 계정](#데모-계정)으로 로그인)
+
+![대시보드 화면: 오늘 충전·사용액 카드, 최근 30일 선 그래프, 처리할 일, 상품권별 잔액 비중](docs/screenshots/dashboard.png)
+
 ## 화면
 
 | 메뉴 | 화면 | 보여주는 것 |
@@ -19,6 +23,16 @@ UI 컴포넌트는 직접 만들어 npm에 배포한 [`@xoheeoh/components`](htt
 | 고객센터 | 일괄 수기처리 | 요청 목록(상세, 마스킹해제) → 요청 화면: 양식 다운로드 → **엑셀 업로드를 브라우저에서 읽어 양식·필수값 검사** → 가능여부 확인 → 요청 등록 |
 | | 상품권 양도 | 양도 내역 목록(상세, 마스킹해제) → 양도 요청 화면(회원 ID 조회 → 상품권 선택 → 요청) |
 | 통계 | 알림 발송 통계 | 2단 머리글·합계 고정 행이 있는 표, 집계 기준 안내, 엑셀 다운로드 |
+
+### 미리보기
+
+| 로그인 | 고객 지갑 조회 |
+| :---: | :---: |
+| ![로그인 화면](docs/screenshots/login.png) | ![고객 지갑 조회 화면: 조회 도구막대와 지갑 목록 표](docs/screenshots/wallet-list.png) |
+| **고객 지갑 상세** | **상품권 등록** |
+| ![고객 지갑 상세 화면: 고객 정보, 보유 상품권, 최근 거래](docs/screenshots/wallet-detail.png) | ![상품권 등록 폼 화면](docs/screenshots/voucher-form.png) |
+| **알림 발송 통계** | |
+| ![알림 발송 통계 화면: 2단 머리글과 합계 고정 행이 있는 표](docs/screenshots/sending-stats.png) | |
 
 공통으로 들어간 것:
 
@@ -77,6 +91,8 @@ npm run dev      # 개발 서버 (http://localhost:5180)
 ## 디렉터리 구조
 
 ```
+docs/
+  screenshots/      README에 넣는 화면 캡처 (배포본에는 포함되지 않음)
 public/
   img/              로고·예시 이미지 (주소 /img/... 로 접근)
 src/
